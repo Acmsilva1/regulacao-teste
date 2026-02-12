@@ -7,9 +7,9 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap');
         * { font-family: 'Inter', sans-serif; color: #000 !important; font-weight: 900 !important; }
-        body { font-size: 11px; background-color: #cbd5e1; padding-top: 160px; scroll-behavior: smooth; }
+        body { font-size: 11px; background-color: #cbd5e1; padding-top: 165px; scroll-behavior: smooth; }
         
-        /* Header e KPIs */
+        /* Header e KPIs Globais */
         #kpi-header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: #fff; border-bottom: 4px solid #000; padding: 10px 20px; display: flex; flex-direction: column; gap: 10px; }
         .top-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; }
         .kpi-num { font-size: 24px; line-height: 1; }
@@ -19,24 +19,25 @@
             justify-content: center; cursor: pointer; background: #f8fafc; font-size: 22px;
             box-shadow: 4px 4px 0px #000; transition: all 0.1s;
         }
-        .home-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #000; }
 
-        /* Dashboard de Setores com Submenus */
+        /* Dashboard de Setores */
         #sector-dashboard { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; }
-        .sector-card { border: 2px solid #000; min-width: 150px; background: #fff; flex-shrink: 0; display: flex; flex-direction: column; }
+        .sector-card { border: 2px solid #000; min-width: 165px; background: #fff; flex-shrink: 0; display: flex; flex-direction: column; }
         .sector-name { background: #A9A9A9; font-size: 9px; padding: 4px; text-align: center; border-bottom: 2px solid #000; text-transform: uppercase; }
-        .sector-stats { display: flex; border-bottom: 1px solid #000; }
-        .stat-box { flex: 1; text-align: center; padding: 4px 2px; border-right: 1px solid #000; }
-        .stat-box:last-child { border-right: none; }
-        .stat-val { font-size: 16px; display: block; line-height: 1; }
-        .stat-label { font-size: 8px; color: #64748b; text-transform: uppercase; display: block; margin-top: 2px; }
         
-        /* Submenu de Postos/Alas */
-        .sector-subs { background: #f1f5f9; }
-        .sub-item { display: flex; justify-content: space-between; padding: 2px 6px; font-size: 8px; border-bottom: 1px solid #e2e8f0; }
+        /* Cores Semânticas Estratégicas */
+        .stat-box { flex: 1; text-align: center; padding: 6px 2px; border-right: 1px solid #000; }
+        .stat-box:last-child { border-right: none; }
+        .stat-val { font-size: 18px; display: block; line-height: 1; }
+        .stat-label { font-size: 7px; color: #64748b; text-transform: uppercase; display: block; margin-top: 2px; }
+        
+        /* Submenus com Contraste Corrigido */
+        .sector-subs { background: #f8fafc; border-top: 1px solid #000; }
+        .sub-item { display: flex; justify-content: space-between; padding: 4px 8px; font-size: 9px; border-bottom: 1px solid #e2e8f0; }
         .sub-item:last-child { border-bottom: none; }
+        .sub-count { font-variant-numeric: tabular-nums; letter-spacing: -0.5px; }
 
-        /* Tabela */
+        /* Tabela Principal */
         table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 2px solid #000; }
         td, th { border: 1px solid #000 !important; padding: 8px; height: 42px; }
         .setor-row { background-color: #0f172a !important; cursor: pointer; }
@@ -55,18 +56,16 @@
     <div id="kpi-header">
         <div class="top-bar">
             <div class="flex gap-4">
-                <div class="flex flex-col"><span class="text-[8px] uppercase">Geral</span><span id="kpi-total" class="kpi-num">0</span></div>
-                <div class="flex flex-col text-blue-900"><span class="text-[8px] uppercase">Ocupados</span><span id="kpi-ocupados" class="kpi-num">0</span></div>
+                <div class="flex flex-col"><span class="text-[8px] uppercase">Total</span><span id="kpi-total" class="kpi-num">0</span></div>
+                <div class="flex flex-col text-red-600"><span class="text-[8px] uppercase">Ocupados</span><span id="kpi-ocupados" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-green-700"><span class="text-[8px] uppercase">Livres</span><span id="kpi-livres" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-green-600"><span class="text-[8px] uppercase">Altas</span><span id="kpi-altas" class="kpi-num">0</span></div>
-                <div class="flex flex-col text-purple-700"><span class="text-[8px] uppercase">Ocupação</span><span id="kpi-taxa" class="kpi-num">0%</span></div>
+                <div class="flex flex-col text-purple-700"><span class="text-[8px] uppercase">Taxa Ocup.</span><span id="kpi-taxa" class="kpi-num">0%</span></div>
             </div>
-
             <div class="flex flex-col items-center gap-1">
                 <h1 class="text-[10px] uppercase tracking-widest opacity-60">Regulação de Leitos</h1>
                 <div class="home-btn" onclick="resetHome()">⌂</div>
             </div>
-
             <div class="flex gap-4">
                 <div class="flex flex-col text-pink-600"><span class="text-[8px] uppercase">Isolamento</span><span id="kpi-isolamento" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-red-600"><span class="text-[8px] uppercase">Bloqueio</span><span id="kpi-bloqueados" class="kpi-num">0</span></div>
@@ -108,7 +107,6 @@
 
         async function syncData(leitoId, campo, valor) {
             try {
-                // Sanitização para Planejamento Estratégico e LGPD
                 const cleanVal = typeof valor === 'string' ? valor.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : valor;
                 await fetch(`${API_URL}/atualizar`, {
                     method: 'POST',
@@ -116,14 +114,14 @@
                     body: JSON.stringify({ n: leitoId, [campo]: cleanVal })
                 });
                 
-                // Atualiza o cache local para refletir nos KPIs sem novo fetch imediato
+                // Atualização Otimista do Cache
                 const item = cachedData.find(i => i.identificador === leitoId);
                 if (item) {
-                    const fieldMap = {'p': 'paciente_nome', 'a': 'atendimento', 'sx': 'sexo', 'o': 'origem', 's': 'status', 'obs': 'observacao', 'obs_s': 'observacao_status'};
-                    item[fieldMap[campo] || campo] = cleanVal;
+                    const map = {'p':'paciente_nome','a':'atendimento','sx':'sexo','o':'origem','s':'status','obs':'observacao','obs_s':'observacao_status'};
+                    item[map[campo] || campo] = cleanVal;
                     updateKPIs();
                 }
-            } catch (e) { console.error("Erro na sincronização"); }
+            } catch (e) { console.error("Falha na sincronização"); }
         }
 
         async function loadCenso() {
@@ -131,7 +129,7 @@
                 const response = await fetch(`${API_URL}/censo`);
                 cachedData = await response.json();
                 renderTable(cachedData);
-            } catch (e) { console.warn("Modo Offline ou API Indisponível"); }
+            } catch (e) { console.warn("API Offline"); }
         }
 
         function renderTable(dados) {
@@ -193,10 +191,9 @@
             let g = { t: 0, o: 0, l: 0, i: 0, b: 0, a: 0 };
             let porSetor = {};
 
-            // Processamento via Cache (Melhor Arquitetura)
             cachedData.forEach(item => {
                 const s = item.setor;
-                const sub = item.sub_header || "GERAL";
+                const sub = item.sub_header || "OUTROS";
                 const st = item.status;
 
                 if (!porSetor[s]) porSetor[s] = { l: 0, o: 0, subs: {} };
@@ -216,22 +213,26 @@
                 }
             });
 
-            // Atualiza IDs Globais
+            // Atualiza KPIs Globais
             document.getElementById('kpi-total').innerText = g.t;
             document.getElementById('kpi-ocupados').innerText = g.o;
             document.getElementById('kpi-livres').innerText = g.l;
+            document.getElementById('kpi-altas').innerText = g.a;
             document.getElementById('kpi-isolamento').innerText = g.i;
             document.getElementById('kpi-bloqueados').innerText = g.b;
-            document.getElementById('kpi-altas').innerText = g.a;
             document.getElementById('kpi-taxa').innerText = g.t > 0 ? `${((g.o / g.t) * 100).toFixed(1)}%` : '0%';
 
-            // Render Dashboard com Submenus (Postos/Apartamentos)
+            // Render Dashboard com Cores: VERDE (Livre) / VERMELHO (Ocupado)
             document.getElementById('sector-dashboard').innerHTML = Object.keys(porSetor).map(setor => {
                 const sData = porSetor[setor];
                 const subHtml = Object.keys(sData.subs).map(sub => `
                     <div class="sub-item">
                         <span class="truncate pr-2">${sub}</span>
-                        <span><b class="text-green-700">${sData.subs[sub].l}L</b> / <b class="text-blue-900">${sData.subs[sub].o}O</b></span>
+                        <span class="sub-count">
+                            <span class="text-green-700">${sData.subs[sub].l}L</span> 
+                            <span class="text-black/10 mx-1">|</span> 
+                            <span class="text-red-600">${sData.subs[sub].o}OC</span>
+                        </span>
                     </div>
                 `).join('');
 
@@ -239,15 +240,14 @@
                 <div class="sector-card">
                     <div class="sector-name">${setor}</div>
                     <div class="sector-stats">
-                        <div class="stat-box bg-green-50"><span class="stat-val text-green-700">${sData.l}</span><span class="stat-label">LIVRES</span></div>
-                        <div class="stat-box bg-blue-50"><span class="stat-val text-blue-900">${sData.o}</span><span class="stat-label">OCUP</span></div>
+                        <div class="stat-box"><span class="stat-val text-green-700">${sData.l}</span><span class="stat-label">LIVRES</span></div>
+                        <div class="stat-box"><span class="stat-val text-red-600">${sData.o}</span><span class="stat-label">OCUP</span></div>
                     </div>
                     <div class="sector-subs">${subHtml}</div>
                 </div>`;
             }).join('');
         }
 
-        // Eventos de Status Menu
         document.addEventListener('click', (e) => {
             const cell = e.target.closest('.status-cell');
             if (cell && !e.target.closest('.extra-container')) {
@@ -264,10 +264,9 @@
 
         window.applyStatus = (status) => {
             const row = targetCell.closest('tr');
-            const leitoId = row.dataset.id;
-            syncData(leitoId, 's', status);
+            syncData(row.dataset.id, 's', status);
             document.getElementById('status-menu').style.display = 'none';
-            renderTable(cachedData); 
+            renderTable(cachedData);
         };
 
         loadCenso();
