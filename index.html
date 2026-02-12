@@ -9,10 +9,12 @@
         * { font-family: 'Inter', sans-serif; color: #000 !important; font-weight: 900 !important; }
         body { font-size: 11px; background-color: #cbd5e1; padding-top: 150px; scroll-behavior: smooth; }
         
+        /* Header Fixo e KPIs */
         #kpi-header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: #fff; border-bottom: 4px solid #000; padding: 10px 20px; display: flex; flex-direction: column; gap: 10px; }
         .top-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; }
         .kpi-num { font-size: 24px; line-height: 1; }
         
+        /* Botão Home Estratégico */
         .home-btn { 
             width: 45px; height: 35px; border: 3px solid #000; display: flex; align-items: center; 
             justify-content: center; cursor: pointer; background: #f8fafc; font-size: 22px;
@@ -20,14 +22,17 @@
         }
         .home-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #000; }
 
+        /* Dashboard de Setores - Ajuste Anti-Confusão (L/O) */
         #sector-dashboard { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
-        .sector-card { border: 2px solid #000; min-width: 110px; background: #e2e8f0; flex-shrink: 0; }
-        .sector-name { background: #A9A9A9; font-size: 9px; padding: 2px; text-align: center; border-bottom: 2px solid #000; }
+        .sector-card { border: 2px solid #000; min-width: 120px; background: #e2e8f0; flex-shrink: 0; }
+        .sector-name { background: #A9A9A9; font-size: 9px; padding: 4px; text-align: center; border-bottom: 2px solid #000; text-transform: uppercase; }
         .sector-stats { display: flex; background: #fff; }
-        .stat-box { flex: 1; text-align: center; padding: 2px; border-right: 1px solid #000; }
+        .stat-box { flex: 1; text-align: center; padding: 4px 2px; border-right: 1px solid #000; }
         .stat-box:last-child { border-right: none; }
-        .stat-val { font-size: 14px; display: block; }
+        .stat-val { font-size: 16px; display: block; line-height: 1; }
+        .stat-label { font-size: 8px; color: #64748b; text-transform: uppercase; display: block; margin-top: 2px; }
 
+        /* Tabela e Linhas */
         table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 2px solid #000; }
         td, th { border: 1px solid #000 !important; padding: 8px; height: 42px; }
         .setor-row { background-color: #0f172a !important; cursor: pointer; }
@@ -35,6 +40,7 @@
         .sub-header { background-color: #e2e8f0 !important; font-size: 10px; text-transform: uppercase; }
         .hidden-row { display: none !important; }
         
+        /* Menu de Status Neumórfico/Brutalista */
         #status-menu { display: none; position: absolute; z-index: 1000; min-width: 200px; border: 3px solid #000; background: white; box-shadow: 5px 5px 0px #000; }
         .menu-item { @apply p-3 text-[11px] uppercase cursor-pointer border-b border-black/20; }
         .extra-container { width: 100%; margin-top: 4px; }
@@ -47,19 +53,19 @@
         <div class="top-bar">
             <div class="flex gap-4">
                 <div class="flex flex-col"><span class="text-[8px] uppercase">Geral</span><span id="kpi-total" class="kpi-num">0</span></div>
-                <div class="flex flex-col text-blue-900"><span class="text-[8px] uppercase">Ocup</span><span id="kpi-ocupados" class="kpi-num">0</span></div>
-                <div class="flex flex-col text-green-700"><span class="text-[8px] uppercase">Livre</span><span id="kpi-livres" class="kpi-num">0</span></div>
+                <div class="flex flex-col text-blue-900"><span class="text-[8px] uppercase">Ocupados</span><span id="kpi-ocupados" class="kpi-num">0</span></div>
+                <div class="flex flex-col text-green-700"><span class="text-[8px] uppercase">Livres</span><span id="kpi-livres" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-green-600"><span class="text-[8px] uppercase">Altas</span><span id="kpi-altas" class="kpi-num">0</span></div>
             </div>
 
             <div class="flex flex-col items-center gap-1">
-                <h1 class="text-[10px] uppercase tracking-widest opacity-60">Regulação</h1>
+                <h1 class="text-[10px] uppercase tracking-widest opacity-60">Regulação de Leitos</h1>
                 <div class="home-btn" onclick="resetHome()">⌂</div>
             </div>
 
             <div class="flex gap-4">
-                <div class="flex flex-col text-pink-600"><span class="text-[8px] uppercase">Isol</span><span id="kpi-isolamento" class="kpi-num">0</span></div>
-                <div class="flex flex-col text-red-600"><span class="text-[8px] uppercase">Bloq</span><span id="kpi-bloqueados" class="kpi-num">0</span></div>
+                <div class="flex flex-col text-pink-600"><span class="text-[8px] uppercase">Isolamento</span><span id="kpi-isolamento" class="kpi-num">0</span></div>
+                <div class="flex flex-col text-red-600"><span class="text-[8px] uppercase">Bloqueio</span><span id="kpi-bloqueados" class="kpi-num">0</span></div>
             </div>
         </div>
         <div id="sector-dashboard"></div>
@@ -98,13 +104,15 @@
 
         async function syncData(leitoId, campo, valor) {
             try {
+                // Filtro LGPD/Sanitização antes de enviar
+                const cleanVal = typeof valor === 'string' ? valor.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : valor;
                 await fetch(`${API_URL}/atualizar`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ n: leitoId, [campo]: valor })
+                    body: JSON.stringify({ n: leitoId, [campo]: cleanVal })
                 });
                 updateKPIs();
-            } catch (e) { console.error("Erro sync"); }
+            } catch (e) { console.error("Erro na sincronização"); }
         }
 
         async function loadCenso() {
@@ -112,7 +120,7 @@
                 const response = await fetch(`${API_URL}/censo`);
                 cachedData = await response.json();
                 renderTable(cachedData);
-            } catch (e) { console.warn("Offline"); }
+            } catch (e) { console.warn("Modo Offline ou API Indisponível"); }
         }
 
         function renderTable(dados) {
@@ -141,7 +149,7 @@
                     extra = `<input type="text" class="extra-info" placeholder="MOTIVO..." value="${item.observacao_status || ''}" onblur="syncData('${item.identificador}', 'obs_s', this.value)">`;
                 }
 
-                // LÓGICA DE ORIGEM POR TIPO DE LEITO
+                // LÓGICA DE ORIGEM CONTEXTUAL
                 let origens = ['PS HMS', 'PS VV', 'CC', 'EXTERNO'];
                 if (item.tipo === 'UTI') {
                     origens = ['PS HMS', 'PS VV', 'CC', 'INTERCORRÊNCIA', 'EXTERNO'];
@@ -247,18 +255,25 @@
             document.getElementById('kpi-bloqueados').innerText = g.b;
             document.getElementById('kpi-altas').innerText = g.a;
 
+            // Renderização do Dashboard com rótulos por extenso para evitar ambiguidade
             document.getElementById('sector-dashboard').innerHTML = Object.keys(porSetor).map(setor => `
                 <div class="sector-card">
                     <div class="sector-name">${setor}</div>
                     <div class="sector-stats">
-                        <div class="stat-box bg-green-50"><span class="stat-val">${porSetor[setor].l}</span><span class="stat-label">L</span></div>
-                        <div class="stat-box bg-blue-50"><span class="stat-val">${porSetor[setor].o}</span><span class="stat-label">O</span></div>
+                        <div class="stat-box bg-green-50">
+                            <span class="stat-val text-green-700">${porSetor[setor].l}</span>
+                            <span class="stat-label">LIVRES</span>
+                        </div>
+                        <div class="stat-box bg-blue-50">
+                            <span class="stat-val text-blue-900">${porSetor[setor].o}</span>
+                            <span class="stat-label">OCUP</span>
+                        </div>
                     </div>
                 </div>`).join('');
         }
 
         loadCenso();
-        setInterval(loadCenso, 45000);
+        setInterval(loadCenso, 45000); // Polling de 45s conforme melhores práticas DevOps
     </script>
 </body>
 </html>
