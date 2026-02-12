@@ -8,29 +8,30 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap');
         * { font-family: 'Inter', sans-serif; color: #000 !important; font-weight: 900 !important; }
         
-        /* Espaçamento generoso para não cobrir o Setor D */
         body { font-size: 11px; background-color: #cbd5e1; padding-top: 240px; scroll-behavior: smooth; }
         
         #kpi-header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: #fff; border-bottom: 4px solid #000; padding: 10px 20px; display: flex; flex-direction: column; gap: 8px; }
         .top-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; }
         .kpi-num { font-size: 26px; line-height: 1; }
         
-        /* Legenda Estratégica */
-        #legenda-global { display: flex; gap: 15px; background: #f1f5f9; padding: 4px 12px; border: 2px solid #000; width: fit-content; margin-bottom: 5px; }
+        .text-livre-kpi { color: #15803d !important; }
+        .text-ocupado-kpi { color: #000000 !important; }
+
+        #legenda-global { display: flex; gap: 15px; background: #f1f5f9; padding: 4px 12px; border: 2px solid #000; width: fit-content; }
         .legenda-item { display: flex; align-items: center; gap: 6px; font-size: 9px; text-transform: uppercase; }
-        .box-l { width: 10px; height: 10px; background: #15803d; } /* Verde */
-        .box-o { width: 10px; height: 10px; background: #000000; } /* Preto */
+        .box-l { width: 10px; height: 10px; background: #15803d; }
+        .box-o { width: 10px; height: 10px; background: #000000; }
 
         .home-btn { 
             width: 45px; height: 35px; border: 3px solid #000; display: flex; align-items: center; 
             justify-content: center; cursor: pointer; background: #f8fafc; font-size: 22px;
             box-shadow: 4px 4px 0px #000; transition: all 0.1s;
         }
+        .home-btn:active { box-shadow: 0px 0px 0px #000; transform: translate(4px, 4px); }
 
         #sector-dashboard { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; }
         .sector-card { border: 2px solid #000; min-width: 170px; background: #fff; flex-shrink: 0; }
         .sector-name { background: #A9A9A9; font-size: 10px; padding: 5px; text-align: center; border-bottom: 2px solid #000; text-transform: uppercase; }
-        
         .sector-stats { display: flex; border-bottom: 1px solid #000; }
         .stat-box { flex: 1; text-align: center; padding: 6px 2px; border-right: 1px solid #000; }
         .stat-box:last-child { border-right: none; }
@@ -39,10 +40,13 @@
         .sub-val-l { color: #15803d !important; } 
         .sub-val-o { color: #000000 !important; }
 
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 2px solid #000; }
-        td, th { border: 1px solid #000 !important; padding: 8px; height: 42px; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 2px solid #000; background: #fff; }
+        th { background: #f1f5f9; text-align: center; font-size: 9px; border: 1px solid #000 !important; padding: 5px; }
+        td { border: 1px solid #000 !important; padding: 8px; height: 42px; }
+        
         .setor-row { background-color: #0f172a !important; cursor: pointer; }
         .setor-text { color: #ffffff !important; font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; }
+        .sub-header-row { background-color: #e2e8f0 !important; font-size: 10px; font-weight: 900; }
         .hidden-row { display: none !important; }
         
         #status-menu { display: none; position: absolute; z-index: 1000; border: 3px solid #000; background: white; box-shadow: 5px 5px 0px #000; }
@@ -55,8 +59,8 @@
         <div class="top-bar">
             <div class="flex gap-4">
                 <div class="flex flex-col"><span>GERAL</span><span id="kpi-total" class="kpi-num">0</span></div>
-                <div class="flex flex-col text-black"><span>OCUPADOS</span><span id="kpi-ocupados" class="kpi-num">0</span></div>
-                <div class="flex flex-col text-green-700"><span>LIVRES</span><span id="kpi-livres" class="kpi-num">0</span></div>
+                <div class="flex flex-col text-ocupado-kpi"><span>OCUPADOS</span><span id="kpi-ocupados" class="kpi-num">0</span></div>
+                <div class="flex flex-col text-livre-kpi"><span>LIVRES</span><span id="kpi-livres" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-purple-700"><span>TAXA</span><span id="kpi-taxa" class="kpi-num">0%</span></div>
             </div>
             <div class="flex flex-col items-center gap-1">
@@ -75,6 +79,10 @@
     </div>
 
     <table>
+        <colgroup>
+            <col style="width: 140px;"><col style="width: 100px;"><col style="width: 350px;">
+            <col style="width: 100px;"><col style="width: 80px;"><col style="width: 150px;"><col style="width: auto;">
+        </colgroup>
         <tbody id="censo-body"></tbody>
     </table>
 
@@ -86,7 +94,8 @@
         let setoresAbertos = new Set();
         const config = { 
             'LIVRE': 'bg-yellow-300', 'SUJO': 'bg-yellow-300', 'LIMPO': 'bg-yellow-300', 'FORRADO': 'bg-yellow-300',
-            'OCUPADO': 'bg-white', 'ALTA': 'bg-green-300', 'RESERVADO': 'bg-sky-400', 'BLOQUEADO': 'bg-red-400', 'ISOLAMENTO': 'bg-pink-300' 
+            'OCUPADO': 'bg-white', 'ALTA': 'bg-green-300', 'ALTA PENDENTE': 'bg-green-400',
+            'RESERVADO': 'bg-sky-400', 'BLOQUEADO': 'bg-red-400', 'ISOLAMENTO': 'bg-pink-300' 
         };
 
         async function loadCenso() {
@@ -94,7 +103,7 @@
                 const r = await fetch(`${API_URL}/censo`);
                 cachedData = await r.json();
                 render();
-            } catch (e) { console.error("Erro."); }
+            } catch (e) { console.error("Erro ao carregar dados."); }
         }
 
         function sync(id, campo, valor) {
@@ -120,17 +129,30 @@
         function render() {
             const body = document.getElementById('censo-body');
             let html = ""; let lastS = ""; let lastSub = "";
+            
             cachedData.forEach(item => {
+                // Render Setor (Header Principal)
                 if (item.setor !== lastS) {
                     lastS = item.setor; lastSub = "";
                     const open = setoresAbertos.has(lastS);
-                    html += `<tr class="setor-row" onclick="toggle('${lastS}')"><td colspan="7" class="setor-text text-white p-3 uppercase"><span>${open ? '[-]' : '[+]'}</span> ${lastS}</td></tr>`;
+                    html += `
+                        <tr class="setor-row" onclick="toggle('${lastS}')">
+                            <td colspan="7" class="setor-text p-3 uppercase"><span>${open ? '[-]' : '[+]'}</span> ${lastS}</td>
+                        </tr>
+                        <tr class="${open ? '' : 'hidden-row'}">
+                            <th>SITUAÇÃO</th><th>LEITO</th><th>PACIENTE</th><th>ATENDIMENTO</th><th>SEXO</th><th>ORIGEM</th><th>OBSERVAÇÃO</th>
+                        </tr>`;
                 }
+
                 const vis = setoresAbertos.has(item.setor) ? "" : "hidden-row";
+
+                // Render Sub-header (Ramificações APT, ENF...)
                 if(item.sub_header && item.sub_header !== lastSub) {
                     lastSub = item.sub_header;
-                    html += `<tr class="bg-slate-200 font-bold ${vis}"><td colspan="7" class="py-1 px-4 uppercase text-[9px]">» ${item.sub_header}</td></tr>`;
+                    html += `<tr class="sub-header-row ${vis}"><td colspan="7" class="py-1 px-4">» ${item.sub_header}</td></tr>`;
                 }
+
+                // Render Linha do Leito
                 html += `
                 <tr class="row-leito ${vis} ${config[item.status] || 'bg-white'}" data-id="${item.identificador}" data-setor="${item.setor}" data-type="${item.tipo}">
                     <td class="status-cell cursor-pointer text-center font-bold"><span class="status-text">${item.status}</span></td>
