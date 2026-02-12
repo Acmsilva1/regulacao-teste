@@ -13,7 +13,6 @@
         .top-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; }
         .kpi-num { font-size: 24px; line-height: 1; }
         
-        /* Estilo do Botão Home */
         .home-btn { 
             width: 45px; height: 35px; border: 3px solid #000; display: flex; align-items: center; 
             justify-content: center; cursor: pointer; background: #f8fafc; font-size: 22px;
@@ -23,12 +22,11 @@
 
         #sector-dashboard { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
         .sector-card { border: 2px solid #000; min-width: 110px; background: #e2e8f0; flex-shrink: 0; }
-        .sector-name { background: #A9A9A9; font-size: 9px; padding: 2px; text-align: center; border-bottom: 2px solid #000; white-space: nowrap; overflow: hidden; }
+        .sector-name { background: #A9A9A9; font-size: 9px; padding: 2px; text-align: center; border-bottom: 2px solid #000; }
         .sector-stats { display: flex; background: #fff; }
         .stat-box { flex: 1; text-align: center; padding: 2px; border-right: 1px solid #000; }
         .stat-box:last-child { border-right: none; }
         .stat-val { font-size: 14px; display: block; }
-        .stat-label { font-size: 7px; text-transform: uppercase; opacity: 0.7; }
 
         table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 2px solid #000; }
         td, th { border: 1px solid #000 !important; padding: 8px; height: 42px; }
@@ -56,7 +54,7 @@
 
             <div class="flex flex-col items-center gap-1">
                 <h1 class="text-[10px] uppercase tracking-widest opacity-60">Regulação</h1>
-                <div class="home-btn" onclick="resetHome()" title="Fechar todos os setores">⌂</div>
+                <div class="home-btn" onclick="resetHome()">⌂</div>
             </div>
 
             <div class="flex gap-4">
@@ -90,9 +88,8 @@
 
         let setoresAbertos = new Set();
         let targetCell = null;
-        let cachedData = []; // Para evitar re-fetch no resetHome
+        let cachedData = [];
 
-        // FUNÇÃO HOME
         function resetHome() {
             setoresAbertos.clear();
             renderTable(cachedData);
@@ -187,11 +184,29 @@
             }
         });
 
+        // CORREÇÃO DO BUG: Manipulação explícita do extra-container
         window.applyStatus = (status) => {
             const row = targetCell.closest('tr');
             const leitoId = row.dataset.id;
+            const extraDiv = targetCell.querySelector('.extra-container');
+            
+            // Atualiza cor e texto
             row.className = `row-leito ${config[status]} ${row.classList.contains('hidden-row') ? 'hidden-row' : ''}`;
-            row.querySelector('.status-text').innerText = status;
+            targetCell.querySelector('.status-text').innerText = status;
+            
+            // Gerencia os campos extras (Limpa e Re-cria se necessário)
+            extraDiv.innerHTML = ''; 
+            if (status === 'ISOLAMENTO') {
+                let options = tiposIsolamento.map(t => `<option value="${t}">${t}</option>`).join('');
+                extraDiv.innerHTML = `<select class="extra-info" onchange="syncData('${leitoId}', 'obs_s', this.value)">${options}</select>`;
+                syncData(leitoId, 'obs_s', tiposIsolamento[0]); // Salva o primeiro por padrão
+            } else if (status === 'BLOQUEADO') {
+                extraDiv.innerHTML = `<input type="text" class="extra-info" placeholder="MOTIVO..." onblur="syncData('${leitoId}', 'obs_s', this.value)">`;
+                syncData(leitoId, 'obs_s', ''); // Limpa o motivo no banco ao bloquear
+            } else {
+                syncData(leitoId, 'obs_s', ''); // Limpa metadados se mudar para ocupado/limpo
+            }
+
             syncData(leitoId, 's', status);
             document.getElementById('status-menu').style.display = 'none';
             updateKPIs();
