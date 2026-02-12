@@ -7,7 +7,9 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap');
         * { font-family: 'Inter', sans-serif; color: #000 !important; font-weight: 900 !important; }
-        body { font-size: 11px; background-color: #cbd5e1; padding-top: 175px; scroll-behavior: smooth; }
+        
+        /* Aumentei para 220px para garantir que nenhum setor (como o D) seja engolido pelo header */
+        body { font-size: 11px; background-color: #cbd5e1; padding-top: 220px; scroll-behavior: smooth; }
         
         #kpi-header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: #fff; border-bottom: 4px solid #000; padding: 10px 20px; display: flex; flex-direction: column; gap: 10px; }
         .top-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; }
@@ -21,19 +23,22 @@
         }
         .home-btn:active { box-shadow: 0px 0px 0px #000; transform: translate(4px, 4px); }
 
+        /* Dashboard de Setores */
         #sector-dashboard { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; }
         .sector-card { border: 2px solid #000; min-width: 160px; background: #fff; flex-shrink: 0; }
         .sector-name { background: #A9A9A9; font-size: 9px; padding: 4px; text-align: center; border-bottom: 2px solid #000; text-transform: uppercase; }
-        
         .sector-stats { display: flex; border-bottom: 1px solid #000; }
         .stat-box { flex: 1; text-align: center; padding: 6px 2px; border-right: 1px solid #000; }
         .stat-box:last-child { border-right: none; }
         .stat-val { font-size: 18px; display: block; line-height: 1; }
-        .stat-label { font-size: 7px; color: #64748b; text-transform: uppercase; display: block; margin-top: 2px; }
 
+        /* Subcampos ramificados */
         .sector-subs { background: #f8fafc; }
         .sub-item { display: flex; justify-content: space-between; padding: 4px 8px; font-size: 9px; border-bottom: 1px solid #e2e8f0; }
+        .sub-val-l { color: #15803d !important; } /* Verde */
+        .sub-val-o { color: #000000 !important; } /* Preto */
 
+        /* Tabela */
         table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 2px solid #000; }
         td, th { border: 1px solid #000 !important; padding: 8px; height: 42px; }
         .setor-row { background-color: #0f172a !important; cursor: pointer; }
@@ -41,6 +46,7 @@
         .sub-header { background-color: #e2e8f0 !important; font-size: 10px; text-transform: uppercase; }
         .hidden-row { display: none !important; }
         
+        /* Menu de Status */
         #status-menu { display: none; position: absolute; z-index: 1000; min-width: 200px; border: 3px solid #000; background: white; box-shadow: 5px 5px 0px #000; }
         .menu-item { @apply p-3 text-[11px] uppercase cursor-pointer border-b border-black/20; }
     </style>
@@ -67,15 +73,13 @@
         <div id="sector-dashboard"></div>
     </div>
 
-    <div class="max-w-full mx-auto bg-white">
-        <table>
-            <colgroup>
-                <col style="width: 140px;"><col style="width: 100px;"><col style="width: 350px;">
-                <col style="width: 100px;"><col style="width: 80px;"><col style="width: 150px;"><col style="width: auto;">
-            </colgroup>
-            <tbody id="censo-body"></tbody>
-        </table>
-    </div>
+    <table>
+        <colgroup>
+            <col style="width: 140px;"><col style="width: 100px;"><col style="width: 350px;">
+            <col style="width: 100px;"><col style="width: 80px;"><col style="width: 150px;"><col style="width: auto;">
+        </colgroup>
+        <tbody id="censo-body"></tbody>
+    </table>
 
     <div id="status-menu"></div>
 
@@ -83,17 +87,22 @@
         const API_URL = `${window.location.origin}/api/v1`;
         let cachedData = [];
         let setoresAbertos = new Set();
-        const config = { 'LIVRE': 'bg-yellow-300', 'OCUPADO': 'bg-white', 'ALTA': 'bg-green-300', 'BLOQUEADO': 'bg-red-400', 'ISOLAMENTO': 'bg-pink-300', 'RESERVADO': 'bg-sky-400', 'SUJO': 'bg-yellow-300', 'LIMPO': 'bg-yellow-300', 'FORRADO': 'bg-yellow-300' };
+        
+        const config = { 
+            'LIVRE': 'bg-yellow-300', 'SUJO': 'bg-yellow-300', 'LIMPO': 'bg-yellow-300', 'FORRADO': 'bg-yellow-300',
+            'OCUPADO': 'bg-white', 'ALTA': 'bg-green-300', 'ALTA PENDENTE': 'bg-green-400',
+            'RESERVADO': 'bg-sky-400', 'BLOQUEADO': 'bg-red-400', 'ISOLAMENTO': 'bg-pink-300' 
+        };
 
         async function loadCenso() {
             try {
                 const r = await fetch(`${API_URL}/censo`);
                 cachedData = await r.json();
                 render();
-            } catch (e) { console.warn("Modo Offline"); }
+            } catch (e) { console.error("Falha na conexão."); }
         }
 
-        // DELAY ZERO (Optimistic UI)
+        // FUNÇÃO SEM DELAY: Muda o visual local antes de enviar pro banco
         function sync(id, campo, valor) {
             const item = cachedData.find(i => i.identificador === id);
             if (!item) return;
@@ -101,6 +110,7 @@
             const map = {'p':'paciente_nome','a':'atendimento','sx':'sexo','o':'origem','s':'status','obs':'observacao'};
             item[map[campo] || campo] = valor.toUpperCase();
 
+            // Atualiza tela agora!
             updateKPIs();
             const row = document.querySelector(`tr[data-id="${id}"]`);
             if (row && campo === 's') {
@@ -108,6 +118,7 @@
                 row.querySelector('.status-text').innerText = valor.toUpperCase();
             }
 
+            // Sincroniza em background
             fetch(`${API_URL}/atualizar`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -118,6 +129,7 @@
         function render() {
             const body = document.getElementById('censo-body');
             let html = ""; let lastS = ""; let lastSub = "";
+            
             cachedData.forEach(item => {
                 if (item.setor !== lastS) {
                     lastS = item.setor; lastSub = "";
@@ -128,7 +140,7 @@
                 const vis = setoresAbertos.has(item.setor) ? "" : "hidden-row";
                 if(item.sub_header && item.sub_header !== lastSub) {
                     lastSub = item.sub_header;
-                    html += `<tr class="sub-header ${vis}"> <td colspan="7">» ${item.sub_header}</td> </tr>`;
+                    html += `<tr class="sub-header ${vis}"><td colspan="7">» ${item.sub_header}</td></tr>`;
                 }
 
                 html += `
@@ -152,7 +164,7 @@
 
             cachedData.forEach(item => {
                 const s = item.setor;
-                const sub = (item.sub_header || "GERAL").toUpperCase().replace('APARTAMENTO', 'APT').replace('ENFERMARIA', 'ENF').replace('POSTO 1', 'P1').replace('POSTO 2', 'P2');
+                const sub = (item.sub_header || "OUTROS").toUpperCase().replace('APARTAMENTO', 'APT').replace('ENFERMARIA', 'ENF').replace('POSTO 1', 'P1').replace('POSTO 2', 'P2');
                 
                 if (!porSetor[s]) porSetor[s] = { l: 0, o: 0, subs: {} };
                 if (!porSetor[s].subs[sub]) porSetor[s].subs[sub] = { l: 0, o: 0 };
@@ -163,19 +175,21 @@
                 if (ocupado) { 
                     g.o++; porSetor[s].o++; porSetor[s].subs[sub].o++; 
                     if (item.status === 'ISOLAMENTO') g.i++;
-                    if (item.status.includes('ALTA')) g.a++;
-                } else if (item.status === 'BLOQUEADO') { g.b++; }
-                else { g.l++; porSetor[s].l++; porSetor[s].subs[sub].l++; }
+                } else if (item.status === 'BLOQUEADO') { 
+                    g.b++; 
+                } else { 
+                    g.l++; porSetor[s].l++; porSetor[s].subs[sub].l++; 
+                }
             });
 
             document.getElementById('kpi-total').innerText = g.t;
             document.getElementById('kpi-ocupados').innerText = g.o;
             document.getElementById('kpi-livres').innerText = g.l;
-            document.getElementById('kpi-taxa').innerText = g.t > 0 ? `${((g.o/g.t)*100).toFixed(1)}%` : '0%';
             document.getElementById('kpi-isolamento').innerText = g.i;
             document.getElementById('kpi-bloqueados').innerText = g.b;
+            document.getElementById('kpi-taxa').innerText = g.t > 0 ? `${((g.o/g.t)*100).toFixed(1)}%` : '0%';
 
-            // RENDER DASHBOARD: Apenas números e cores
+            // Render do Dashboard de Setores (Imagem 2)
             document.getElementById('sector-dashboard').innerHTML = Object.keys(porSetor).map(s => `
                 <div class="sector-card">
                     <div class="sector-name">${s}</div>
@@ -187,7 +201,11 @@
                         ${Object.keys(porSetor[s].subs).map(sub => `
                             <div class="sub-item">
                                 <span>${sub}</span>
-                                <span><b class="text-green-700">${porSetor[s].subs[sub].l}</b><b class="text-black/20 mx-1">|</b><b class="text-black">${porSetor[s].subs[sub].o}</b></span>
+                                <span>
+                                    <b class="sub-val-l">${porSetor[s].subs[sub].l}</b>
+                                    <b class="text-black/10 mx-1">|</b>
+                                    <b class="sub-val-o">${porSetor[s].subs[sub].o}</b>
+                                </span>
                             </div>`).join('')}
                     </div>
                 </div>`).join('');
