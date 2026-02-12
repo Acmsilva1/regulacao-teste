@@ -9,7 +9,7 @@
         * { font-family: 'Inter', sans-serif; color: #000 !important; font-weight: 900 !important; }
         body { font-size: 11px; background-color: #cbd5e1; padding-top: 110px; }
         
-        /* Fix para tabelas e bordas */
+        /* Arquitetura de Tabelas e Bordas */
         table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 2px solid #000; }
         td, th { border: 1px solid #000 !important; padding: 8px; height: 42px; }
         
@@ -19,7 +19,7 @@
         
         .setor-row { background-color: #0f172a !important; cursor: pointer; }
         .setor-text { color: #ffffff !important; font-size: 14px; text-transform: uppercase; letter-spacing: 0.2em; border: none !important; }
-        .sub-header { @apply bg-slate-300 text-[10px] uppercase italic; }
+        .sub-header { background-color: #e2e8f0 !important; font-size: 11px; text-transform: uppercase; }
         .hidden-row { display: none !important; }
         
         #status-menu { display: none; position: absolute; z-index: 1000; min-width: 180px; border: 3px solid #000; background: white; box-shadow: 5px 5px 0px #000; }
@@ -61,7 +61,6 @@
             'RESERVADO': 'bg-[#0EA5E9]', 'BLOQUEADO': 'bg-[#EF4444]', 'ISOLAMENTO': 'bg-[#F472B6]'
         };
 
-        // Estado persistente dos setores
         let setoresAbertos = new Set();
         let targetCell = null;
 
@@ -88,11 +87,14 @@
             const body = document.getElementById('censo-body');
             let html = "";
             let lastSetor = "";
-            let lastSub = "";
+            let lastSub = ""; 
 
             dados.forEach(item => {
+                // Ao trocar de setor (ex: do D para o A), resetamos o lastSub
                 if(item.setor !== lastSetor) {
                     lastSetor = item.setor;
+                    lastSub = ""; // Isso garante que o título apareça no topo de CADA setor
+                    
                     const isOpen = setoresAbertos.has(lastSetor);
                     html += `
                         <tr class="setor-row" onclick="toggleSetor(this, '${lastSetor}')">
@@ -106,6 +108,8 @@
                 }
 
                 const isVisible = setoresAbertos.has(lastSetor);
+
+                // Se mudar de categoria (ou se for o primeiro leito do setor), imprime » ENFERMARIA/APARTAMENTO
                 if(item.sub_header !== lastSub) {
                     lastSub = item.sub_header;
                     html += `<tr class="sub-header ${isVisible ? '' : 'hidden-row'}"><td colspan="7">» ${item.sub_header}</td></tr>`;
@@ -117,10 +121,10 @@
                     <td class="text-center italic font-bold">${item.identificador}</td>
                     <td contenteditable="true" onblur="syncData('${item.identificador}', 'p', this.innerText)">${item.paciente_nome || ''}</td>
                     <td contenteditable="true" class="text-center" onblur="syncData('${item.identificador}', 'a', this.innerText)">${item.atendimento || ''}</td>
-                    <td class="p-0"><select class="bg-transparent w-full text-center" onchange="syncData('${item.identificador}', 'sx', this.value)">
+                    <td class="p-0"><select class="bg-transparent w-full text-center outline-none" onchange="syncData('${item.identificador}', 'sx', this.value)">
                         <option value=""></option><option value="M" ${item.sexo === 'M' ? 'selected' : ''}>M</option><option value="F" ${item.sexo === 'F' ? 'selected' : ''}>F</option>
                     </select></td>
-                    <td class="p-0"><select class="bg-transparent w-full italic px-2" onchange="syncData('${item.identificador}', 'o', this.value)">
+                    <td class="p-0"><select class="bg-transparent w-full italic px-2 outline-none" onchange="syncData('${item.identificador}', 'o', this.value)">
                         <option value=""></option><option value="PS HMS" ${item.origem === 'PS HMS' ? 'selected' : ''}>PS HMS</option><option value="EXTERNO" ${item.origem === 'EXTERNO' ? 'selected' : ''}>EXTERNO</option>
                     </select></td>
                     <td contenteditable="true" class="italic" onblur="syncData('${item.identificador}', 'obs', this.innerText)">${item.observacao || ''}</td>
@@ -133,7 +137,7 @@
         function toggleSetor(el, nomeSetor) {
             if (setoresAbertos.has(nomeSetor)) setoresAbertos.delete(nomeSetor);
             else setoresAbertos.add(nomeSetor);
-            loadCenso(); // Re-renderiza mantendo o estado
+            loadCenso(); 
         }
 
         document.addEventListener('click', (e) => {
@@ -173,7 +177,7 @@
         }
 
         loadCenso();
-        setInterval(loadCenso, 45000); // Polling estratégico a cada 45s
+        setInterval(loadCenso, 45000); 
     </script>
 </body>
 </html>
