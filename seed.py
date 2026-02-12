@@ -1,19 +1,18 @@
 import os
-from dotenv import load_dotenv
-from main import SessionLocal, LeitoModel
+from supabase import create_client, Client
 
-# 1. Carrega as variáveis de ambiente do arquivo .env antes de iniciar a sessão
-load_dotenv()
+# Configuração via Secrets do GitHub
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise ValueError("Variáveis SUPABASE_URL ou SUPABASE_KEY não configuradas no GitHub Secrets.")
+
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def popular_banco():
-    """
-    Executa o mapeamento e inserção dos leitos conforme a estrutura hospitalar definida.
-    Segue o princípio de evitar duplicação (Idempotência).
-    """
-    db = SessionLocal()
-    
-    # Mapeamento Direto de Leitos (Preservado do original)
-    leitos_completos = [
+    # MAPEAMENTO INTEGRAL DE 96 LEITOS - ESTRUTURA HOSPITALAR ANDRÉ
+    leitos_raw = [
         # --- SETOR D (2° ANDAR) ---
         {"s": "SETOR D (2° ANDAR)", "h": "ENFERMARIA", "n": "ENF 202-A", "t": "ENF"},
         {"s": "SETOR D (2° ANDAR)", "h": "ENFERMARIA", "n": "ENF 202-B", "t": "ENF"},
@@ -121,32 +120,29 @@ def popular_banco():
         {"s": "UTI GERAL (4° ANDAR)", "h": "POSTO 2", "n": "BOX 26", "t": "UTI"},
     ]
 
+    # Prepara os dados para o Supabase
+    leitos_final = []
+    for item in leitos_raw:
+        leitos_final.append({
+            "setor": item['s'],
+            "sub_header": item['h'],
+            "identificador": item['n'],
+            "tipo": item['t'],
+            "status": "LIVRE" if item['t'] == "UTI" else "FORRADO"
+        })
+
     try:
-        for item in leitos_completos:
-            # Busca se o identificador já existe para não criar duplicatas
-            existe = db.query(LeitoModel).filter(LeitoModel.identificador == item['n']).first()
-            
-            if not existe:
-                # Regra de status inicial: UTI inicia LIVRE, Enfermaria inicia FORRADO
-                status_inicial = "LIVRE" if item['t'] == "UTI" else "FORRADO"
-                
-                db.add(LeitoModel(
-                    identificador=item['n'],
-                    setor=item['s'],
-                    sub_header=item['h'],
-                    tipo=item['t'],
-                    status=status_inicial
-                ))
+        print("🛠️ Limpando regulação anterior...")
+        # Exclui todos os registros para começar do zero
+        supabase.table("movimentacao_leitos").delete().neq("identificador", "RESET_V96").execute()
         
-        db.commit()
-        print(f"🚀 Censo Populado com Sucesso: {len(leitos_completos)} leitos processados.")
-    
+        print(f"📡 Injetando {len(leitos_final)} leitos no banco...")
+        # Insere o bloco completo
+        supabase.table("movimentacao_leitos").insert(leitos_final).execute()
+        
+        print("✅ Operação Finalizada: 96 leitos carregados com sucesso.")
     except Exception as e:
-        db.rollback()
-        print(f"❌ Erro ao popular banco: {str(e)}")
-    
-    finally:
-        db.close()
+        print(f"❌ Falha Estratégica: {e}")
 
 if __name__ == "__main__":
     popular_banco()
