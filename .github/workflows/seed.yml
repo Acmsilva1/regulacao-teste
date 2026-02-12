@@ -1,11 +1,10 @@
 name: "PROV: Database Seed"
 
-# Configuração Estratégica: Acionamento apenas Manual via interface do GitHub
 on:
   workflow_dispatch:
     inputs:
       confirm_run:
-        description: 'Digite "SIM" para confirmar a carga de leitos no Supabase'
+        description: 'Digite "SIM" para confirmar a carga de 96 leitos'
         required: true
         default: 'NAO'
 
@@ -13,7 +12,6 @@ jobs:
   database_provisioning:
     runs-on: ubuntu-latest
     
-    # Camada de segurança: Só executa se o input for EXATAMENTE "SIM"
     if: github.event.inputs.confirm_run == 'SIM'
 
     steps:
@@ -32,6 +30,7 @@ jobs:
 
       - name: 4. Execução do Seed (Carga de Dados no Supabase)
         env:
+          # Mudamos aqui: agora passamos as chaves individuais que o seed.py espera
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: python seed.py
