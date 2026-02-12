@@ -6,12 +6,11 @@ SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 if not SUPABASE_URL or not SUPABASE_KEY:
-    raise ValueError("Variáveis SUPABASE_URL ou SUPABASE_KEY não configuradas no GitHub Secrets.")
+    raise ValueError("Variáveis SUPABASE_URL ou SUPABASE_KEY não configuradas.")
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def popular_banco():
-    # MAPEAMENTO INTEGRAL DE 96 LEITOS - ESTRUTURA HOSPITALAR ANDRÉ
     leitos_raw = [
         # --- SETOR D (2° ANDAR) ---
         {"s": "SETOR D (2° ANDAR)", "h": "ENFERMARIA", "n": "ENF 202-A", "t": "ENF"},
@@ -35,7 +34,7 @@ def popular_banco():
         {"s": "SETOR A (3° ANDAR)", "h": "APARTAMENTO", "n": "APT 307", "t": "ENF"},
         {"s": "SETOR A (3° ANDAR)", "h": "APARTAMENTO", "n": "ISOL 308", "t": "ENF"},
         {"s": "SETOR A (3° ANDAR)", "h": "APARTAMENTO", "n": "APT 309", "t": "ENF"},
-        {"s": "SETOR A (3° ANDAR)", "h": "APARTAMENTO", "n": "APT 318", "t": "ENF"},
+        # Mudança para ENFERMARIA (Gera o título no front)
         {"s": "SETOR A (3° ANDAR)", "h": "ENFERMARIA", "n": "ENF 310-A", "t": "ENF"},
         {"s": "SETOR A (3° ANDAR)", "h": "ENFERMARIA", "n": "ENF 310-B", "t": "ENF"},
         {"s": "SETOR A (3° ANDAR)", "h": "ENFERMARIA", "n": "ENF 311-A", "t": "ENF"},
@@ -52,6 +51,8 @@ def popular_banco():
         {"s": "SETOR A (3° ANDAR)", "h": "ENFERMARIA", "n": "ENF 316-B", "t": "ENF"},
         {"s": "SETOR A (3° ANDAR)", "h": "ENFERMARIA", "n": "ENF 317-A", "t": "ENF"},
         {"s": "SETOR A (3° ANDAR)", "h": "ENFERMARIA", "n": "ENF 317-B", "t": "ENF"},
+        # Volta para APARTAMENTO
+        {"s": "SETOR A (3° ANDAR)", "h": "APARTAMENTO", "n": "APT 318", "t": "ENF"},
 
         # --- SETOR B (3° ANDAR) ---
         {"s": "SETOR B (3° ANDAR)", "h": "ENFERMARIA", "n": "ENF 319-A", "t": "ENF"},
@@ -70,6 +71,7 @@ def popular_banco():
         {"s": "SETOR B (3° ANDAR)", "h": "ENFERMARIA", "n": "ENF 325-B", "t": "ENF"},
         {"s": "SETOR B (3° ANDAR)", "h": "ENFERMARIA", "n": "ENF 326-A", "t": "ENF"},
         {"s": "SETOR B (3° ANDAR)", "h": "ENFERMARIA", "n": "ENF 326-B", "t": "ENF"},
+        # Mudança para APARTAMENTO (Gera o título no front)
         {"s": "SETOR B (3° ANDAR)", "h": "APARTAMENTO", "n": "ISOL 327", "t": "ENF"},
         {"s": "SETOR B (3° ANDAR)", "h": "APARTAMENTO", "n": "APT 328", "t": "ENF"},
         {"s": "SETOR B (3° ANDAR)", "h": "APARTAMENTO", "n": "ISOL 329", "t": "ENF"},
@@ -120,7 +122,6 @@ def popular_banco():
         {"s": "UTI GERAL (4° ANDAR)", "h": "POSTO 2", "n": "BOX 26", "t": "UTI"},
     ]
 
-    # Prepara os dados para o Supabase
     leitos_final = []
     for item in leitos_raw:
         leitos_final.append({
@@ -132,17 +133,12 @@ def popular_banco():
         })
 
     try:
-        print("🛠️ Limpando regulação anterior...")
-        # Exclui todos os registros para começar do zero
-        supabase.table("movimentacao_leitos").delete().neq("identificador", "RESET_V96").execute()
-        
-        print(f"📡 Injetando {len(leitos_final)} leitos no banco...")
-        # Insere o bloco completo
+        # Deleta tudo para evitar duplicidade e garantir a nova ordem
+        supabase.table("movimentacao_leitos").delete().neq("identificador", "RESET_FIX").execute()
         supabase.table("movimentacao_leitos").insert(leitos_final).execute()
-        
-        print("✅ Operação Finalizada: 96 leitos carregados com sucesso.")
+        print(f"✅ Sucesso: {len(leitos_final)} leitos mapeados estrategicamente.")
     except Exception as e:
-        print(f"❌ Falha Estratégica: {e}")
+        print(f"❌ Erro no seed: {e}")
 
 if __name__ == "__main__":
     popular_banco()
