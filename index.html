@@ -35,8 +35,11 @@
             <div class="flex flex-col"><span class="text-[9px] uppercase text-blue-900">Ocup</span><span id="kpi-ocupados" class="kpi-num text-blue-900">0</span></div>
             <div class="flex flex-col"><span class="text-[9px] uppercase text-green-700">Livre</span><span id="kpi-livres" class="kpi-num text-green-700">0</span></div>
         </div>
+        
         <h1 id="main-title">Censo Hospitalar em Tempo Real</h1>
-        <div class="flex gap-5">
+        
+        <div class="kpi-group flex items-center gap-5">
+            <div class="flex flex-col text-right"><span class="text-[9px] uppercase text-green-600">Altas</span><span id="kpi-altas" class="kpi-num text-green-600">0</span></div>
             <div class="flex flex-col text-right"><span class="text-[9px] uppercase text-pink-600">Isolam</span><span id="kpi-isolamento" class="kpi-num text-pink-600">0</span></div>
             <div class="flex flex-col text-right"><span class="text-[9px] uppercase text-red-600">Bloq</span><span id="kpi-bloqueados" class="kpi-num text-red-600">0</span></div>
         </div>
@@ -189,11 +192,12 @@
 
         function updateKPIs() {
             const statusTexts = document.querySelectorAll('.status-text');
-            let total = statusTexts.length, ocup = 0, liv = 0, isol = 0, bloq = 0;
+            let total = statusTexts.length, ocup = 0, liv = 0, isol = 0, bloq = 0, altas = 0;
             statusTexts.forEach(span => {
                 const s = span.innerText;
                 if(s === 'ISOLAMENTO') { isol++; ocup++; }
-                else if(['OCUPADO','ALTA','ALTA PENDENTE','RESERVADO'].includes(s)) ocup++;
+                else if(['ALTA','ALTA PENDENTE'].includes(s)) { altas++; ocup++; }
+                else if(['OCUPADO','RESERVADO'].includes(s)) ocup++;
                 else if(s === 'BLOQUEADO') bloq++;
                 else liv++;
             });
@@ -202,6 +206,7 @@
             document.getElementById('kpi-livres').innerText = liv;
             document.getElementById('kpi-isolamento').innerText = isol;
             document.getElementById('kpi-bloqueados').innerText = bloq;
+            document.getElementById('kpi-altas').innerText = altas;
         }
 
         loadCenso();
