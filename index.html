@@ -141,6 +141,18 @@
                     extra = `<input type="text" class="extra-info" placeholder="MOTIVO..." value="${item.observacao_status || ''}" onblur="syncData('${item.identificador}', 'obs_s', this.value)">`;
                 }
 
+                // LÓGICA DE ORIGEM POR TIPO DE LEITO
+                let origens = ['PS HMS', 'PS VV', 'CC', 'EXTERNO'];
+                if (item.tipo === 'UTI') {
+                    origens = ['PS HMS', 'PS VV', 'CC', 'INTERCORRÊNCIA', 'EXTERNO'];
+                } else {
+                    origens = ['PS HMS', 'PS VV', 'CC', 'EXTERNO', 'ALTA UTI CLI', 'ALTA UTI CIR'];
+                }
+
+                let origemOpts = `<option value=""></option>` + origens.map(o => 
+                    `<option value="${o}" ${item.origem === o ? 'selected' : ''}>${o}</option>`
+                ).join('');
+
                 html += `
                 <tr class="row-leito ${config[item.status]} ${isVisible ? '' : 'hidden-row'}" data-type="${item.tipo}" data-setor="${item.setor}" data-id="${item.identificador}">
                     <td class="status-cell cursor-pointer text-center">
@@ -153,9 +165,11 @@
                     <td class="p-0"><select class="bg-transparent w-full text-center outline-none" onchange="syncData('${item.identificador}', 'sx', this.value)">
                         <option value=""></option><option value="M" ${item.sexo === 'M' ? 'selected' : ''}>M</option><option value="F" ${item.sexo === 'F' ? 'selected' : ''}>F</option>
                     </select></td>
-                    <td class="p-0"><select class="bg-transparent w-full italic px-1 outline-none" onchange="syncData('${item.identificador}', 'o', this.value)">
-                        <option value=""></option><option value="PS HMS" ${item.origem === 'PS HMS' ? 'selected' : ''}>PS HMS</option><option value="EXTERNO" ${item.origem === 'EXTERNO' ? 'selected' : ''}>EXTERNO</option>
-                    </select></td>
+                    <td class="p-0">
+                        <select class="bg-transparent w-full italic px-1 outline-none" onchange="syncData('${item.identificador}', 'o', this.value)">
+                            ${origemOpts}
+                        </select>
+                    </td>
                     <td contenteditable="true" class="italic px-2 uppercase" onblur="syncData('${item.identificador}', 'obs', this.innerText)">${item.observacao || ''}</td>
                 </tr>`;
             });
@@ -184,27 +198,24 @@
             }
         });
 
-        // CORREÇÃO DO BUG: Manipulação explícita do extra-container
         window.applyStatus = (status) => {
             const row = targetCell.closest('tr');
             const leitoId = row.dataset.id;
             const extraDiv = targetCell.querySelector('.extra-container');
             
-            // Atualiza cor e texto
             row.className = `row-leito ${config[status]} ${row.classList.contains('hidden-row') ? 'hidden-row' : ''}`;
             targetCell.querySelector('.status-text').innerText = status;
             
-            // Gerencia os campos extras (Limpa e Re-cria se necessário)
             extraDiv.innerHTML = ''; 
             if (status === 'ISOLAMENTO') {
                 let options = tiposIsolamento.map(t => `<option value="${t}">${t}</option>`).join('');
                 extraDiv.innerHTML = `<select class="extra-info" onchange="syncData('${leitoId}', 'obs_s', this.value)">${options}</select>`;
-                syncData(leitoId, 'obs_s', tiposIsolamento[0]); // Salva o primeiro por padrão
+                syncData(leitoId, 'obs_s', tiposIsolamento[0]);
             } else if (status === 'BLOQUEADO') {
                 extraDiv.innerHTML = `<input type="text" class="extra-info" placeholder="MOTIVO..." onblur="syncData('${leitoId}', 'obs_s', this.value)">`;
-                syncData(leitoId, 'obs_s', ''); // Limpa o motivo no banco ao bloquear
+                syncData(leitoId, 'obs_s', '');
             } else {
-                syncData(leitoId, 'obs_s', ''); // Limpa metadados se mudar para ocupado/limpo
+                syncData(leitoId, 'obs_s', '');
             }
 
             syncData(leitoId, 's', status);
