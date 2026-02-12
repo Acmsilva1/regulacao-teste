@@ -53,8 +53,7 @@
 
     <script>
         // Configuração de API - Troque pela URL do seu Render quando fizer o deploy
-        const API_URL = window.location.hostname === 'localhost' ? "http://localhost:8000/api/v1" : "https://SUA-API-NO-RENDER.onrender.com/api/v1";
-
+        const API_URL = `${window.location.origin}/api/v1`;
         const config = {
             'LIVRE': 'bg-[#FDE047]', 'SUJO': 'bg-[#FDE047]', 'LIMPO': 'bg-[#FDE047]', 'FORRADO': 'bg-[#FDE047]',
             'OCUPADO': 'bg-white', 'ALTA': 'bg-[#86EFAC]', 'ALTA PENDENTE': 'bg-[#166534]',
