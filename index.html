@@ -8,46 +8,44 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap');
         * { font-family: 'Inter', sans-serif; color: #000 !important; font-weight: 900 !important; }
         
-        /* Aumentei para 220px para garantir que nenhum setor (como o D) seja engolido pelo header */
-        body { font-size: 11px; background-color: #cbd5e1; padding-top: 220px; scroll-behavior: smooth; }
+        /* Espaçamento generoso para não cobrir o Setor D */
+        body { font-size: 11px; background-color: #cbd5e1; padding-top: 240px; scroll-behavior: smooth; }
         
-        #kpi-header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: #fff; border-bottom: 4px solid #000; padding: 10px 20px; display: flex; flex-direction: column; gap: 10px; }
+        #kpi-header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: #fff; border-bottom: 4px solid #000; padding: 10px 20px; display: flex; flex-direction: column; gap: 8px; }
         .top-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; }
-        .kpi-num { font-size: 24px; line-height: 1; }
+        .kpi-num { font-size: 26px; line-height: 1; }
         
-        /* Botão Home Original */
+        /* Legenda Estratégica */
+        #legenda-global { display: flex; gap: 15px; background: #f1f5f9; padding: 4px 12px; border: 2px solid #000; width: fit-content; margin-bottom: 5px; }
+        .legenda-item { display: flex; align-items: center; gap: 6px; font-size: 9px; text-transform: uppercase; }
+        .box-l { width: 10px; height: 10px; background: #15803d; } /* Verde */
+        .box-o { width: 10px; height: 10px; background: #000000; } /* Preto */
+
         .home-btn { 
             width: 45px; height: 35px; border: 3px solid #000; display: flex; align-items: center; 
             justify-content: center; cursor: pointer; background: #f8fafc; font-size: 22px;
             box-shadow: 4px 4px 0px #000; transition: all 0.1s;
         }
-        .home-btn:active { box-shadow: 0px 0px 0px #000; transform: translate(4px, 4px); }
 
-        /* Dashboard de Setores */
         #sector-dashboard { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; }
-        .sector-card { border: 2px solid #000; min-width: 160px; background: #fff; flex-shrink: 0; }
-        .sector-name { background: #A9A9A9; font-size: 9px; padding: 4px; text-align: center; border-bottom: 2px solid #000; text-transform: uppercase; }
+        .sector-card { border: 2px solid #000; min-width: 170px; background: #fff; flex-shrink: 0; }
+        .sector-name { background: #A9A9A9; font-size: 10px; padding: 5px; text-align: center; border-bottom: 2px solid #000; text-transform: uppercase; }
+        
         .sector-stats { display: flex; border-bottom: 1px solid #000; }
         .stat-box { flex: 1; text-align: center; padding: 6px 2px; border-right: 1px solid #000; }
         .stat-box:last-child { border-right: none; }
-        .stat-val { font-size: 18px; display: block; line-height: 1; }
+        
+        .sub-item { display: flex; justify-content: space-between; padding: 4px 10px; font-size: 10px; border-bottom: 1px solid #e2e8f0; }
+        .sub-val-l { color: #15803d !important; } 
+        .sub-val-o { color: #000000 !important; }
 
-        /* Subcampos ramificados */
-        .sector-subs { background: #f8fafc; }
-        .sub-item { display: flex; justify-content: space-between; padding: 4px 8px; font-size: 9px; border-bottom: 1px solid #e2e8f0; }
-        .sub-val-l { color: #15803d !important; } /* Verde */
-        .sub-val-o { color: #000000 !important; } /* Preto */
-
-        /* Tabela */
         table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 2px solid #000; }
         td, th { border: 1px solid #000 !important; padding: 8px; height: 42px; }
         .setor-row { background-color: #0f172a !important; cursor: pointer; }
-        .setor-text { color: #ffffff !important; font-size: 14px; text-transform: uppercase; letter-spacing: 0.2em; border: none !important; }
-        .sub-header { background-color: #e2e8f0 !important; font-size: 10px; text-transform: uppercase; }
+        .setor-text { color: #ffffff !important; font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; }
         .hidden-row { display: none !important; }
         
-        /* Menu de Status */
-        #status-menu { display: none; position: absolute; z-index: 1000; min-width: 200px; border: 3px solid #000; background: white; box-shadow: 5px 5px 0px #000; }
+        #status-menu { display: none; position: absolute; z-index: 1000; border: 3px solid #000; background: white; box-shadow: 5px 5px 0px #000; }
         .menu-item { @apply p-3 text-[11px] uppercase cursor-pointer border-b border-black/20; }
     </style>
 </head>
@@ -56,28 +54,27 @@
     <div id="kpi-header">
         <div class="top-bar">
             <div class="flex gap-4">
-                <div class="flex flex-col"><span class="text-[8px] uppercase">Geral</span><span id="kpi-total" class="kpi-num">0</span></div>
-                <div class="flex flex-col text-red-600"><span class="text-[8px] uppercase">Ocupados</span><span id="kpi-ocupados" class="kpi-num">0</span></div>
-                <div class="flex flex-col text-green-700"><span class="text-[8px] uppercase">Livres</span><span id="kpi-livres" class="kpi-num">0</span></div>
-                <div class="flex flex-col text-purple-700"><span class="text-[8px] uppercase">Taxa</span><span id="kpi-taxa" class="kpi-num">0%</span></div>
+                <div class="flex flex-col"><span>GERAL</span><span id="kpi-total" class="kpi-num">0</span></div>
+                <div class="flex flex-col text-black"><span>OCUPADOS</span><span id="kpi-ocupados" class="kpi-num">0</span></div>
+                <div class="flex flex-col text-green-700"><span>LIVRES</span><span id="kpi-livres" class="kpi-num">0</span></div>
+                <div class="flex flex-col text-purple-700"><span>TAXA</span><span id="kpi-taxa" class="kpi-num">0%</span></div>
             </div>
             <div class="flex flex-col items-center gap-1">
-                <h1 class="text-[10px] uppercase tracking-widest opacity-60">Regulação de Leitos</h1>
+                <div id="legenda-global">
+                    <div class="legenda-item"><div class="box-l"></div> LIVRE</div>
+                    <div class="legenda-item"><div class="box-o"></div> OCUPADO</div>
+                </div>
                 <div class="home-btn" onclick="resetHome()">⌂</div>
             </div>
             <div class="flex gap-4">
-                <div class="flex flex-col text-pink-600"><span class="text-[8px] uppercase">Isolamento</span><span id="kpi-isolamento" class="kpi-num">0</span></div>
-                <div class="flex flex-col text-red-600"><span class="text-[8px] uppercase">Bloqueio</span><span id="kpi-bloqueados" class="kpi-num">0</span></div>
+                <div class="flex flex-col text-pink-600"><span>ISOLAMENTO</span><span id="kpi-isolamento" class="kpi-num">0</span></div>
+                <div class="flex flex-col text-red-600"><span>BLOQUEIO</span><span id="kpi-bloqueados" class="kpi-num">0</span></div>
             </div>
         </div>
         <div id="sector-dashboard"></div>
     </div>
 
     <table>
-        <colgroup>
-            <col style="width: 140px;"><col style="width: 100px;"><col style="width: 350px;">
-            <col style="width: 100px;"><col style="width: 80px;"><col style="width: 150px;"><col style="width: auto;">
-        </colgroup>
         <tbody id="censo-body"></tbody>
     </table>
 
@@ -87,11 +84,9 @@
         const API_URL = `${window.location.origin}/api/v1`;
         let cachedData = [];
         let setoresAbertos = new Set();
-        
         const config = { 
             'LIVRE': 'bg-yellow-300', 'SUJO': 'bg-yellow-300', 'LIMPO': 'bg-yellow-300', 'FORRADO': 'bg-yellow-300',
-            'OCUPADO': 'bg-white', 'ALTA': 'bg-green-300', 'ALTA PENDENTE': 'bg-green-400',
-            'RESERVADO': 'bg-sky-400', 'BLOQUEADO': 'bg-red-400', 'ISOLAMENTO': 'bg-pink-300' 
+            'OCUPADO': 'bg-white', 'ALTA': 'bg-green-300', 'RESERVADO': 'bg-sky-400', 'BLOQUEADO': 'bg-red-400', 'ISOLAMENTO': 'bg-pink-300' 
         };
 
         async function loadCenso() {
@@ -99,18 +94,15 @@
                 const r = await fetch(`${API_URL}/censo`);
                 cachedData = await r.json();
                 render();
-            } catch (e) { console.error("Falha na conexão."); }
+            } catch (e) { console.error("Erro."); }
         }
 
-        // FUNÇÃO SEM DELAY: Muda o visual local antes de enviar pro banco
         function sync(id, campo, valor) {
             const item = cachedData.find(i => i.identificador === id);
             if (!item) return;
-
             const map = {'p':'paciente_nome','a':'atendimento','sx':'sexo','o':'origem','s':'status','obs':'observacao'};
             item[map[campo] || campo] = valor.toUpperCase();
-
-            // Atualiza tela agora!
+            
             updateKPIs();
             const row = document.querySelector(`tr[data-id="${id}"]`);
             if (row && campo === 's') {
@@ -118,7 +110,6 @@
                 row.querySelector('.status-text').innerText = valor.toUpperCase();
             }
 
-            // Sincroniza em background
             fetch(`${API_URL}/atualizar`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -129,28 +120,25 @@
         function render() {
             const body = document.getElementById('censo-body');
             let html = ""; let lastS = ""; let lastSub = "";
-            
             cachedData.forEach(item => {
                 if (item.setor !== lastS) {
                     lastS = item.setor; lastSub = "";
                     const open = setoresAbertos.has(lastS);
-                    html += `<tr class="setor-row" onclick="toggle('${lastS}')"><td colspan="7" class="setor-text"><span>${open ? '[-]' : '[+]'}</span> ${lastS}</td></tr>
-                             <tr class="col-header ${open ? '' : 'hidden-row'}"><th>SITUAÇÃO</th><th>LEITO</th><th>PACIENTE</th><th>ATENDIMENTO</th><th>SEXO</th><th>ORIGEM</th><th>OBSERVAÇÃO</th></tr>`;
+                    html += `<tr class="setor-row" onclick="toggle('${lastS}')"><td colspan="7" class="setor-text text-white p-3 uppercase"><span>${open ? '[-]' : '[+]'}</span> ${lastS}</td></tr>`;
                 }
                 const vis = setoresAbertos.has(item.setor) ? "" : "hidden-row";
                 if(item.sub_header && item.sub_header !== lastSub) {
                     lastSub = item.sub_header;
-                    html += `<tr class="sub-header ${vis}"><td colspan="7">» ${item.sub_header}</td></tr>`;
+                    html += `<tr class="bg-slate-200 font-bold ${vis}"><td colspan="7" class="py-1 px-4 uppercase text-[9px]">» ${item.sub_header}</td></tr>`;
                 }
-
                 html += `
                 <tr class="row-leito ${vis} ${config[item.status] || 'bg-white'}" data-id="${item.identificador}" data-setor="${item.setor}" data-type="${item.tipo}">
-                    <td class="status-cell cursor-pointer text-center"><span class="status-text">${item.status}</span></td>
-                    <td class="text-center font-bold border-r-2 border-black/20">${item.identificador}</td>
+                    <td class="status-cell cursor-pointer text-center font-bold"><span class="status-text">${item.status}</span></td>
+                    <td class="text-center font-bold border-r-2 border-black/10">${item.identificador}</td>
                     <td contenteditable="true" onblur="sync('${item.identificador}', 'p', this.innerText)">${item.paciente_nome || ''}</td>
                     <td contenteditable="true" class="text-center" onblur="sync('${item.identificador}', 'a', this.innerText)">${item.atendimento || ''}</td>
                     <td class="text-center">${item.sexo || ''}</td>
-                    <td class="text-[10px]">${item.origem || ''}</td>
+                    <td class="text-[9px] uppercase">${item.origem || ''}</td>
                     <td contenteditable="true" onblur="sync('${item.identificador}', 'obs', this.innerText)">${item.observacao || ''}</td>
                 </tr>`;
             });
@@ -159,68 +147,50 @@
         }
 
         function updateKPIs() {
-            let g = { t: 0, o: 0, l: 0, i: 0, b: 0, a: 0 };
+            let g = { t: 0, o: 0, l: 0, i: 0, b: 0 };
             let porSetor = {};
 
             cachedData.forEach(item => {
                 const s = item.setor;
-                const sub = (item.sub_header || "OUTROS").toUpperCase().replace('APARTAMENTO', 'APT').replace('ENFERMARIA', 'ENF').replace('POSTO 1', 'P1').replace('POSTO 2', 'P2');
-                
+                const sub = (item.sub_header || "GERAL").toUpperCase().replace('APARTAMENTO', 'APT').replace('ENFERMARIA', 'ENF').replace('POSTO 1', 'P1').replace('POSTO 2', 'P2');
                 if (!porSetor[s]) porSetor[s] = { l: 0, o: 0, subs: {} };
                 if (!porSetor[s].subs[sub]) porSetor[s].subs[sub] = { l: 0, o: 0 };
 
                 g.t++;
                 const ocupado = ['OCUPADO', 'RESERVADO', 'ISOLAMENTO', 'ALTA', 'ALTA PENDENTE'].includes(item.status);
-                
                 if (ocupado) { 
                     g.o++; porSetor[s].o++; porSetor[s].subs[sub].o++; 
                     if (item.status === 'ISOLAMENTO') g.i++;
-                } else if (item.status === 'BLOQUEADO') { 
-                    g.b++; 
-                } else { 
-                    g.l++; porSetor[s].l++; porSetor[s].subs[sub].l++; 
-                }
+                } else if (item.status === 'BLOQUEADO') { g.b++; }
+                else { g.l++; porSetor[s].l++; porSetor[s].subs[sub].l++; }
             });
 
             document.getElementById('kpi-total').innerText = g.t;
             document.getElementById('kpi-ocupados').innerText = g.o;
             document.getElementById('kpi-livres').innerText = g.l;
+            document.getElementById('kpi-taxa').innerText = g.t > 0 ? `${((g.o/g.t)*100).toFixed(1)}%` : '0%';
             document.getElementById('kpi-isolamento').innerText = g.i;
             document.getElementById('kpi-bloqueados').innerText = g.b;
-            document.getElementById('kpi-taxa').innerText = g.t > 0 ? `${((g.o/g.t)*100).toFixed(1)}%` : '0%';
 
-            // Render do Dashboard de Setores (Imagem 2)
             document.getElementById('sector-dashboard').innerHTML = Object.keys(porSetor).map(s => `
                 <div class="sector-card">
                     <div class="sector-name">${s}</div>
                     <div class="sector-stats">
-                        <div class="stat-box"><span class="stat-val text-green-700">${porSetor[s].l}</span></div>
-                        <div class="stat-box"><span class="stat-val text-black">${porSetor[s].o}</span></div>
+                        <div class="stat-box text-green-700 text-lg">${porSetor[s].l}</div>
+                        <div class="stat-box text-black text-lg">${porSetor[s].o}</div>
                     </div>
-                    <div class="sector-subs">
+                    <div class="bg-white">
                         ${Object.keys(porSetor[s].subs).map(sub => `
                             <div class="sub-item">
                                 <span>${sub}</span>
-                                <span>
-                                    <b class="sub-val-l">${porSetor[s].subs[sub].l}</b>
-                                    <b class="text-black/10 mx-1">|</b>
-                                    <b class="sub-val-o">${porSetor[s].subs[sub].o}</b>
-                                </span>
+                                <span><b class="sub-val-l">${porSetor[s].subs[sub].l}</b><b class="text-black/10 mx-1">|</b><b class="sub-val-o">${porSetor[s].subs[sub].o}</b></span>
                             </div>`).join('')}
                     </div>
                 </div>`).join('');
         }
 
-        function toggle(s) {
-            setoresAbertos.has(s) ? setoresAbertos.delete(s) : setoresAbertos.add(s);
-            render();
-        }
-
-        function resetHome() {
-            setoresAbertos.clear();
-            render();
-            window.scrollTo({top: 0, behavior: 'smooth'});
-        }
+        function toggle(s) { setoresAbertos.has(s) ? setoresAbertos.delete(s) : setoresAbertos.add(s); render(); }
+        function resetHome() { setoresAbertos.clear(); render(); window.scrollTo({top: 0, behavior: 'smooth'}); }
 
         document.addEventListener('click', e => {
             const cell = e.target.closest('.status-cell');
