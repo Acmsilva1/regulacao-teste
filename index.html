@@ -7,30 +7,26 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap');
         * { font-family: 'Inter', sans-serif; color: #000 !important; font-weight: 900 !important; }
-        body { font-size: 11px; background-color: #cbd5e1; padding-top: 170px; scroll-behavior: smooth; }
+        body { font-size: 11px; background-color: #cbd5e1; padding-top: 160px; }
         
         #kpi-header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: #fff; border-bottom: 4px solid #000; padding: 10px 20px; display: flex; flex-direction: column; gap: 8px; }
         .top-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; }
         .kpi-num { font-size: 24px; line-height: 1; }
         
-        /* Atalhos de Setor */
-        #nav-shortcuts { display: flex; justify-content: center; gap: 10px; margin-top: 5px; }
-        .nav-btn { 
-            width: 25px; height: 25px; border: 2px solid #000; display: flex; align-items: center; 
-            justify-content: center; cursor: pointer; border-radius: 4px; font-size: 10px; 
-            transition: all 0.2s; background: #fff;
+        /* Botão Home */
+        .home-btn { 
+            width: 40px; height: 35px; border: 3px solid #000; display: flex; align-items: center; 
+            justify-content: center; cursor: pointer; background: #f8fafc; font-size: 20px;
+            box-shadow: 3px 3px 0px #000; transition: all 0.1s;
         }
-        .nav-btn:hover { background: #0f172a; color: #fff !important; }
-        .nav-btn.active { background: #0f172a; color: #fff !important; }
+        .home-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px #000; }
 
         #sector-dashboard { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
         .sector-card { border: 2px solid #000; min-width: 100px; background: #e2e8f0; flex-shrink: 0; }
         .sector-name { background: #A9A9A9; font-size: 9px; padding: 2px; text-align: center; border-bottom: 2px solid #000; }
         .sector-stats { display: flex; background: #fff; }
         .stat-box { flex: 1; text-align: center; padding: 2px; border-right: 1px solid #000; }
-        .stat-box:last-child { border-right: none; }
         .stat-val { font-size: 14px; display: block; }
-        .stat-label { font-size: 7px; text-transform: uppercase; opacity: 0.7; }
 
         table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 2px solid #000; }
         td, th { border: 1px solid #000 !important; padding: 8px; height: 42px; }
@@ -41,7 +37,6 @@
         
         #status-menu { display: none; position: absolute; z-index: 1000; min-width: 200px; border: 3px solid #000; background: white; box-shadow: 5px 5px 0px #000; }
         .menu-item { @apply p-3 text-[11px] uppercase cursor-pointer border-b border-black/20; }
-        .extra-info { font-size: 8px; width: 100%; border: 1px solid #000; text-align: center; outline: none; background: rgba(255,255,255,0.5); }
     </style>
 </head>
 <body>
@@ -55,14 +50,8 @@
             </div>
             
             <div class="flex flex-col items-center">
-                <h1 class="text-xs uppercase tracking-widest">Regulação Hospitalar</h1>
-                <div id="nav-shortcuts">
-                    <div class="nav-btn" onclick="focusSetor('SETOR A')">A</div>
-                    <div class="nav-btn" onclick="focusSetor('SETOR B')">B</div>
-                    <div class="nav-btn" onclick="focusSetor('SETOR C')">C</div>
-                    <div class="nav-btn" onclick="focusSetor('SETOR D')">D</div>
-                    <div class="nav-btn" onclick="focusSetor('UTI')">UTI</div>
-                </div>
+                <h1 class="text-xs uppercase tracking-widest mb-1">Censo Hospitalar</h1>
+                <div class="home-btn" title="Fechar todos os setores" onclick="resetHome()">⌂</div>
             </div>
 
             <div class="flex gap-4">
@@ -97,6 +86,14 @@
 
         let setoresAbertos = new Set();
         let targetCell = null;
+        window.currentDados = [];
+
+        // FUNÇÃO HOME: Limpa tudo e volta ao estado inicial
+        function resetHome() {
+            setoresAbertos.clear();
+            renderTable(window.currentDados);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
         async function syncData(leitoId, campo, valor) {
             try {
@@ -112,9 +109,9 @@
         async function loadCenso() {
             try {
                 const response = await fetch(`${API_URL}/censo`);
-                const dados = await response.json();
-                renderTable(dados);
-            } catch (e) { console.warn("Offline"); }
+                window.currentDados = await response.json();
+                renderTable(window.currentDados);
+            } catch (e) { console.warn("Backend Offline"); }
         }
 
         function renderTable(dados) {
@@ -125,7 +122,7 @@
                 if(item.setor !== lastSetor) {
                     lastSetor = item.setor; lastSub = "";
                     const isOpen = setoresAbertos.has(lastSetor);
-                    html += `<tr class="setor-row" id="anchor-${lastSetor.replace(' ','-')}" onclick="toggleSetor('${lastSetor}')">
+                    html += `<tr class="setor-row" onclick="toggleSetor('${lastSetor}')">
                                 <td colspan="7" class="setor-text"><span>${isOpen ? '[-]' : '[+]'}</span> ${lastSetor}</td>
                              </tr>
                              <tr class="col-header ${isOpen ? '' : 'hidden-row'}"><th>SITUAÇÃO</th><th>LEITO</th><th>PACIENTE</th><th>ATENDIMENTO</th><th>SEXO</th><th>ORIGEM</th><th>OBSERVAÇÃO</th></tr>`;
@@ -154,12 +151,8 @@
                     <td class="text-center italic font-bold border-r-2 border-black/20">${item.identificador}</td>
                     <td contenteditable="true" class="uppercase px-2" onblur="syncData('${item.identificador}', 'p', this.innerText)">${item.paciente_nome || ''}</td>
                     <td contenteditable="true" class="text-center" onblur="syncData('${item.identificador}', 'a', this.innerText)">${item.atendimento || ''}</td>
-                    <td class="p-0"><select class="bg-transparent w-full text-center" onchange="syncData('${item.identificador}', 'sx', this.value)">
-                        <option value=""></option><option value="M" ${item.sexo === 'M' ? 'selected' : ''}>M</option><option value="F" ${item.sexo === 'F' ? 'selected' : ''}>F</option>
-                    </select></td>
-                    <td class="p-0"><select class="bg-transparent w-full italic px-1" onchange="syncData('${item.identificador}', 'o', this.value)">
-                        <option value=""></option><option value="PS HMS" ${item.origem === 'PS HMS' ? 'selected' : ''}>PS HMS</option><option value="EXTERNO" ${item.origem === 'EXTERNO' ? 'selected' : ''}>EXTERNO</option>
-                    </select></td>
+                    <td class="p-0 text-center">${item.sexo || ''}</td>
+                    <td class="p-0 text-center italic">${item.origem || ''}</td>
                     <td contenteditable="true" class="italic px-2 uppercase" onblur="syncData('${item.identificador}', 'obs', this.innerText)">${item.observacao || ''}</td>
                 </tr>`;
             });
@@ -167,31 +160,10 @@
             updateKPIs();
         }
 
-        // FUNÇÃO DE FOCO EXCLUSIVO
-        function focusSetor(nomeSetor) {
-            setoresAbertos.clear();
-            setoresAbertos.add(nomeSetor);
-            renderTable(window.currentDados); // Renderiza com o novo estado
-            
-            // Scroll suave até o setor
-            setTimeout(() => {
-                const target = document.getElementById(`anchor-${nomeSetor.replace(' ','-')}`);
-                if(target) window.scrollTo({ top: target.offsetTop - 160, behavior: 'smooth' });
-            }, 100);
-        }
-
         function toggleSetor(nome) {
             if (setoresAbertos.has(nome)) setoresAbertos.delete(nome);
             else setoresAbertos.add(nome);
             renderTable(window.currentDados);
-        }
-
-        async function loadCenso() {
-            try {
-                const response = await fetch(`${API_URL}/censo`);
-                window.currentDados = await response.json();
-                renderTable(window.currentDados);
-            } catch (e) { console.warn("Offline"); }
         }
 
         document.addEventListener('click', (e) => {
@@ -244,11 +216,11 @@
             document.getElementById('kpi-altas').innerText = g.a;
 
             document.getElementById('sector-dashboard').innerHTML = Object.keys(porSetor).map(setor => `
-                <div class="sector-card">
+                <div class="sector-card" onclick="toggleSetor('${setor}')" style="cursor:pointer">
                     <div class="sector-name">${setor}</div>
                     <div class="sector-stats">
-                        <div class="stat-box bg-green-50"><span class="stat-val">${porSetor[setor].l}</span><span class="stat-label">L</span></div>
-                        <div class="stat-box bg-blue-50"><span class="stat-val">${porSetor[setor].o}</span><span class="stat-label">O</span></div>
+                        <div class="stat-box bg-green-50"><span class="stat-val">${porSetor[setor].l}</span></div>
+                        <div class="stat-box bg-blue-50"><span class="stat-val">${porSetor[setor].o}</span></div>
                     </div>
                 </div>`).join('');
         }
