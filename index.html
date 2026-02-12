@@ -7,15 +7,25 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap');
         * { font-family: 'Inter', sans-serif; color: #000 !important; font-weight: 900 !important; }
-        body { font-size: 11px; background-color: #cbd5e1; padding-top: 150px; }
+        body { font-size: 11px; background-color: #cbd5e1; padding-top: 170px; scroll-behavior: smooth; }
         
-        #kpi-header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: #fff; border-bottom: 4px solid #000; padding: 10px 20px; display: flex; flex-direction: column; gap: 10px; }
+        #kpi-header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: #fff; border-bottom: 4px solid #000; padding: 10px 20px; display: flex; flex-direction: column; gap: 8px; }
         .top-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; }
         .kpi-num { font-size: 24px; line-height: 1; }
         
+        /* Atalhos de Setor */
+        #nav-shortcuts { display: flex; justify-content: center; gap: 10px; margin-top: 5px; }
+        .nav-btn { 
+            width: 25px; height: 25px; border: 2px solid #000; display: flex; align-items: center; 
+            justify-content: center; cursor: pointer; border-radius: 4px; font-size: 10px; 
+            transition: all 0.2s; background: #fff;
+        }
+        .nav-btn:hover { background: #0f172a; color: #fff !important; }
+        .nav-btn.active { background: #0f172a; color: #fff !important; }
+
         #sector-dashboard { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
-        .sector-card { border: 2px solid #000; min-width: 110px; background: #e2e8f0; flex-shrink: 0; }
-        .sector-name { background: #A9A9A9; font-size: 9px; padding: 2px; text-align: center; border-bottom: 2px solid #000; white-space: nowrap; overflow: hidden; }
+        .sector-card { border: 2px solid #000; min-width: 100px; background: #e2e8f0; flex-shrink: 0; }
+        .sector-name { background: #A9A9A9; font-size: 9px; padding: 2px; text-align: center; border-bottom: 2px solid #000; }
         .sector-stats { display: flex; background: #fff; }
         .stat-box { flex: 1; text-align: center; padding: 2px; border-right: 1px solid #000; }
         .stat-box:last-child { border-right: none; }
@@ -25,14 +35,13 @@
         table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 2px solid #000; }
         td, th { border: 1px solid #000 !important; padding: 8px; height: 42px; }
         .setor-row { background-color: #0f172a !important; cursor: pointer; }
-        .setor-text { color: #ffffff !important; font-size: 14px; text-transform: uppercase; letter-spacing: 0.2em; border: none !important; }
+        .setor-text { color: #ffffff !important; font-size: 14px; text-transform: uppercase; border: none !important; }
         .sub-header { background-color: #e2e8f0 !important; font-size: 10px; text-transform: uppercase; }
         .hidden-row { display: none !important; }
         
         #status-menu { display: none; position: absolute; z-index: 1000; min-width: 200px; border: 3px solid #000; background: white; box-shadow: 5px 5px 0px #000; }
         .menu-item { @apply p-3 text-[11px] uppercase cursor-pointer border-b border-black/20; }
-        .extra-container { width: 100%; margin-top: 4px; }
-        .extra-info { font-size: 8px; font-weight: 900; width: 100%; border: 1px solid #000; text-align: center; text-transform: uppercase; outline: none; background: rgba(255,255,255,0.5); }
+        .extra-info { font-size: 8px; width: 100%; border: 1px solid #000; text-align: center; outline: none; background: rgba(255,255,255,0.5); }
     </style>
 </head>
 <body>
@@ -43,10 +52,21 @@
                 <div class="flex flex-col"><span class="text-[8px] uppercase">Geral</span><span id="kpi-total" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-blue-900"><span class="text-[8px] uppercase">Ocup</span><span id="kpi-ocupados" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-green-700"><span class="text-[8px] uppercase">Livre</span><span id="kpi-livres" class="kpi-num">0</span></div>
-                <div class="flex flex-col text-green-600"><span class="text-[8px] uppercase">Altas</span><span id="kpi-altas" class="kpi-num">0</span></div>
             </div>
-            <h1 class="text-sm uppercase tracking-widest">Controle de Regulação Hospitalar</h1>
+            
+            <div class="flex flex-col items-center">
+                <h1 class="text-xs uppercase tracking-widest">Regulação Hospitalar</h1>
+                <div id="nav-shortcuts">
+                    <div class="nav-btn" onclick="focusSetor('SETOR A')">A</div>
+                    <div class="nav-btn" onclick="focusSetor('SETOR B')">B</div>
+                    <div class="nav-btn" onclick="focusSetor('SETOR C')">C</div>
+                    <div class="nav-btn" onclick="focusSetor('SETOR D')">D</div>
+                    <div class="nav-btn" onclick="focusSetor('UTI')">UTI</div>
+                </div>
+            </div>
+
             <div class="flex gap-4">
+                <div class="flex flex-col text-green-600"><span class="text-[8px] uppercase">Altas</span><span id="kpi-altas" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-pink-600"><span class="text-[8px] uppercase">Isol</span><span id="kpi-isolamento" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-red-600"><span class="text-[8px] uppercase">Bloq</span><span id="kpi-bloqueados" class="kpi-num">0</span></div>
             </div>
@@ -105,7 +125,9 @@
                 if(item.setor !== lastSetor) {
                     lastSetor = item.setor; lastSub = "";
                     const isOpen = setoresAbertos.has(lastSetor);
-                    html += `<tr class="setor-row" onclick="toggleSetor('${lastSetor}')"><td colspan="7" class="setor-text"><span>${isOpen ? '[-]' : '[+]'}</span> ${lastSetor}</td></tr>
+                    html += `<tr class="setor-row" id="anchor-${lastSetor.replace(' ','-')}" onclick="toggleSetor('${lastSetor}')">
+                                <td colspan="7" class="setor-text"><span>${isOpen ? '[-]' : '[+]'}</span> ${lastSetor}</td>
+                             </tr>
                              <tr class="col-header ${isOpen ? '' : 'hidden-row'}"><th>SITUAÇÃO</th><th>LEITO</th><th>PACIENTE</th><th>ATENDIMENTO</th><th>SEXO</th><th>ORIGEM</th><th>OBSERVAÇÃO</th></tr>`;
                 }
 
@@ -132,10 +154,10 @@
                     <td class="text-center italic font-bold border-r-2 border-black/20">${item.identificador}</td>
                     <td contenteditable="true" class="uppercase px-2" onblur="syncData('${item.identificador}', 'p', this.innerText)">${item.paciente_nome || ''}</td>
                     <td contenteditable="true" class="text-center" onblur="syncData('${item.identificador}', 'a', this.innerText)">${item.atendimento || ''}</td>
-                    <td class="p-0"><select class="bg-transparent w-full text-center outline-none" onchange="syncData('${item.identificador}', 'sx', this.value)">
+                    <td class="p-0"><select class="bg-transparent w-full text-center" onchange="syncData('${item.identificador}', 'sx', this.value)">
                         <option value=""></option><option value="M" ${item.sexo === 'M' ? 'selected' : ''}>M</option><option value="F" ${item.sexo === 'F' ? 'selected' : ''}>F</option>
                     </select></td>
-                    <td class="p-0"><select class="bg-transparent w-full italic px-1 outline-none" onchange="syncData('${item.identificador}', 'o', this.value)">
+                    <td class="p-0"><select class="bg-transparent w-full italic px-1" onchange="syncData('${item.identificador}', 'o', this.value)">
                         <option value=""></option><option value="PS HMS" ${item.origem === 'PS HMS' ? 'selected' : ''}>PS HMS</option><option value="EXTERNO" ${item.origem === 'EXTERNO' ? 'selected' : ''}>EXTERNO</option>
                     </select></td>
                     <td contenteditable="true" class="italic px-2 uppercase" onblur="syncData('${item.identificador}', 'obs', this.innerText)">${item.observacao || ''}</td>
@@ -145,13 +167,33 @@
             updateKPIs();
         }
 
+        // FUNÇÃO DE FOCO EXCLUSIVO
+        function focusSetor(nomeSetor) {
+            setoresAbertos.clear();
+            setoresAbertos.add(nomeSetor);
+            renderTable(window.currentDados); // Renderiza com o novo estado
+            
+            // Scroll suave até o setor
+            setTimeout(() => {
+                const target = document.getElementById(`anchor-${nomeSetor.replace(' ','-')}`);
+                if(target) window.scrollTo({ top: target.offsetTop - 160, behavior: 'smooth' });
+            }, 100);
+        }
+
         function toggleSetor(nome) {
             if (setoresAbertos.has(nome)) setoresAbertos.delete(nome);
             else setoresAbertos.add(nome);
-            loadCenso();
+            renderTable(window.currentDados);
         }
 
-        // RESTAURAÇÃO DO CLIQUE NA SITUAÇÃO
+        async function loadCenso() {
+            try {
+                const response = await fetch(`${API_URL}/censo`);
+                window.currentDados = await response.json();
+                renderTable(window.currentDados);
+            } catch (e) { console.warn("Offline"); }
+        }
+
         document.addEventListener('click', (e) => {
             const cell = e.target.closest('.status-cell');
             if (cell && !e.target.closest('.extra-container')) {
@@ -172,15 +214,6 @@
             const leitoId = row.dataset.id;
             row.className = `row-leito ${config[status]} ${row.classList.contains('hidden-row') ? 'hidden-row' : ''}`;
             row.querySelector('.status-text').innerText = status;
-            
-            const extraDiv = row.querySelector('.extra-container');
-            if (status === 'ISOLAMENTO') {
-                let options = tiposIsolamento.map(t => `<option value="${t}">${t}</option>`).join('');
-                extraDiv.innerHTML = `<select class="extra-info" onchange="syncData('${leitoId}', 'obs_s', this.value)">${options}</select>`;
-            } else if (status === 'BLOQUEADO') {
-                extraDiv.innerHTML = `<input type="text" class="extra-info" placeholder="MOTIVO..." onblur="syncData('${leitoId}', 'obs_s', this.value)">`;
-            } else { extraDiv.innerHTML = ''; }
-
             syncData(leitoId, 's', status);
             document.getElementById('status-menu').style.display = 'none';
             updateKPIs();
