@@ -9,12 +9,10 @@
         * { font-family: 'Inter', sans-serif; color: #000 !important; font-weight: 900 !important; }
         body { font-size: 11px; background-color: #cbd5e1; padding-top: 150px; scroll-behavior: smooth; }
         
-        /* Header Fixo e KPIs */
         #kpi-header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: #fff; border-bottom: 4px solid #000; padding: 10px 20px; display: flex; flex-direction: column; gap: 10px; }
         .top-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; }
         .kpi-num { font-size: 24px; line-height: 1; }
         
-        /* Botão Home Estratégico */
         .home-btn { 
             width: 45px; height: 35px; border: 3px solid #000; display: flex; align-items: center; 
             justify-content: center; cursor: pointer; background: #f8fafc; font-size: 22px;
@@ -22,7 +20,6 @@
         }
         .home-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #000; }
 
-        /* Dashboard de Setores - Ajuste Anti-Confusão (L/O) */
         #sector-dashboard { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
         .sector-card { border: 2px solid #000; min-width: 120px; background: #e2e8f0; flex-shrink: 0; }
         .sector-name { background: #A9A9A9; font-size: 9px; padding: 4px; text-align: center; border-bottom: 2px solid #000; text-transform: uppercase; }
@@ -32,7 +29,6 @@
         .stat-val { font-size: 16px; display: block; line-height: 1; }
         .stat-label { font-size: 8px; color: #64748b; text-transform: uppercase; display: block; margin-top: 2px; }
 
-        /* Tabela e Linhas */
         table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 2px solid #000; }
         td, th { border: 1px solid #000 !important; padding: 8px; height: 42px; }
         .setor-row { background-color: #0f172a !important; cursor: pointer; }
@@ -40,7 +36,6 @@
         .sub-header { background-color: #e2e8f0 !important; font-size: 10px; text-transform: uppercase; }
         .hidden-row { display: none !important; }
         
-        /* Menu de Status Neumórfico/Brutalista */
         #status-menu { display: none; position: absolute; z-index: 1000; min-width: 200px; border: 3px solid #000; background: white; box-shadow: 5px 5px 0px #000; }
         .menu-item { @apply p-3 text-[11px] uppercase cursor-pointer border-b border-black/20; }
         .extra-container { width: 100%; margin-top: 4px; }
@@ -56,6 +51,10 @@
                 <div class="flex flex-col text-blue-900"><span class="text-[8px] uppercase">Ocupados</span><span id="kpi-ocupados" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-green-700"><span class="text-[8px] uppercase">Livres</span><span id="kpi-livres" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-green-600"><span class="text-[8px] uppercase">Altas</span><span id="kpi-altas" class="kpi-num">0</span></div>
+                <div class="flex flex-col text-purple-700">
+                    <span class="text-[8px] uppercase">Ocupação</span>
+                    <span id="kpi-taxa" class="kpi-num">0%</span>
+                </div>
             </div>
 
             <div class="flex flex-col items-center gap-1">
@@ -104,7 +103,6 @@
 
         async function syncData(leitoId, campo, valor) {
             try {
-                // Filtro LGPD/Sanitização antes de enviar
                 const cleanVal = typeof valor === 'string' ? valor.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : valor;
                 await fetch(`${API_URL}/atualizar`, {
                     method: 'POST',
@@ -149,17 +147,8 @@
                     extra = `<input type="text" class="extra-info" placeholder="MOTIVO..." value="${item.observacao_status || ''}" onblur="syncData('${item.identificador}', 'obs_s', this.value)">`;
                 }
 
-                // LÓGICA DE ORIGEM CONTEXTUAL
-                let origens = ['PS HMS', 'PS VV', 'CC', 'EXTERNO'];
-                if (item.tipo === 'UTI') {
-                    origens = ['PS HMS', 'PS VV', 'CC', 'INTERCORRÊNCIA', 'EXTERNO'];
-                } else {
-                    origens = ['PS HMS', 'PS VV', 'CC', 'EXTERNO', 'ALTA UTI CLI', 'ALTA UTI CIR'];
-                }
-
-                let origemOpts = `<option value=""></option>` + origens.map(o => 
-                    `<option value="${o}" ${item.origem === o ? 'selected' : ''}>${o}</option>`
-                ).join('');
+                let origens = item.tipo === 'UTI' ? ['PS HMS', 'PS VV', 'CC', 'INTERCORRÊNCIA', 'EXTERNO'] : ['PS HMS', 'PS VV', 'CC', 'EXTERNO', 'ALTA UTI CLI', 'ALTA UTI CIR'];
+                let origemOpts = `<option value=""></option>` + origens.map(o => `<option value="${o}" ${item.origem === o ? 'selected' : ''}>${o}</option>`).join('');
 
                 html += `
                 <tr class="row-leito ${config[item.status]} ${isVisible ? '' : 'hidden-row'}" data-type="${item.tipo}" data-setor="${item.setor}" data-id="${item.identificador}">
@@ -173,11 +162,7 @@
                     <td class="p-0"><select class="bg-transparent w-full text-center outline-none" onchange="syncData('${item.identificador}', 'sx', this.value)">
                         <option value=""></option><option value="M" ${item.sexo === 'M' ? 'selected' : ''}>M</option><option value="F" ${item.sexo === 'F' ? 'selected' : ''}>F</option>
                     </select></td>
-                    <td class="p-0">
-                        <select class="bg-transparent w-full italic px-1 outline-none" onchange="syncData('${item.identificador}', 'o', this.value)">
-                            ${origemOpts}
-                        </select>
-                    </td>
+                    <td class="p-0"><select class="bg-transparent w-full italic px-1 outline-none" onchange="syncData('${item.identificador}', 'o', this.value)">${origemOpts}</select></td>
                     <td contenteditable="true" class="italic px-2 uppercase" onblur="syncData('${item.identificador}', 'obs', this.innerText)">${item.observacao || ''}</td>
                 </tr>`;
             });
@@ -196,8 +181,7 @@
             if (cell && !e.target.closest('.extra-container')) {
                 targetCell = cell;
                 const row = targetCell.closest('tr');
-                const isUti = row.dataset.type === 'UTI';
-                let opts = isUti ? ['LIVRE','OCUPADO','ALTA','ALTA PENDENTE','RESERVADO','BLOQUEADO','ISOLAMENTO'] : ['SUJO','LIMPO','FORRADO','OCUPADO','ALTA','ALTA PENDENTE','BLOQUEADO','ISOLAMENTO'];
+                let opts = row.dataset.type === 'UTI' ? ['LIVRE','OCUPADO','ALTA','ALTA PENDENTE','RESERVADO','BLOQUEADO','ISOLAMENTO'] : ['SUJO','LIMPO','FORRADO','OCUPADO','ALTA','ALTA PENDENTE','BLOQUEADO','ISOLAMENTO'];
                 document.getElementById('menu-content').innerHTML = opts.map(o => `<div onclick="applyStatus('${o}')" class="menu-item ${config[o]}">${o}</div>`).join('');
                 const menu = document.getElementById('status-menu');
                 menu.style.display = 'block'; menu.style.top = `${e.pageY}px`; menu.style.left = `${e.pageX}px`;
@@ -210,22 +194,16 @@
             const row = targetCell.closest('tr');
             const leitoId = row.dataset.id;
             const extraDiv = targetCell.querySelector('.extra-container');
-            
             row.className = `row-leito ${config[status]} ${row.classList.contains('hidden-row') ? 'hidden-row' : ''}`;
             targetCell.querySelector('.status-text').innerText = status;
-            
             extraDiv.innerHTML = ''; 
             if (status === 'ISOLAMENTO') {
-                let options = tiposIsolamento.map(t => `<option value="${t}">${t}</option>`).join('');
-                extraDiv.innerHTML = `<select class="extra-info" onchange="syncData('${leitoId}', 'obs_s', this.value)">${options}</select>`;
+                extraDiv.innerHTML = `<select class="extra-info" onchange="syncData('${leitoId}', 'obs_s', this.value)">${tiposIsolamento.map(t => `<option value="${t}">${t}</option>`).join('')}</select>`;
                 syncData(leitoId, 'obs_s', tiposIsolamento[0]);
             } else if (status === 'BLOQUEADO') {
                 extraDiv.innerHTML = `<input type="text" class="extra-info" placeholder="MOTIVO..." onblur="syncData('${leitoId}', 'obs_s', this.value)">`;
                 syncData(leitoId, 'obs_s', '');
-            } else {
-                syncData(leitoId, 'obs_s', '');
-            }
-
+            } else { syncData(leitoId, 'obs_s', ''); }
             syncData(leitoId, 's', status);
             document.getElementById('status-menu').style.display = 'none';
             updateKPIs();
@@ -248,32 +226,28 @@
                 else { g.l++; porSetor[s].l++; }
             });
 
+            const taxaOcupacao = g.t > 0 ? ((g.o / g.t) * 100).toFixed(1) : 0;
+
             document.getElementById('kpi-total').innerText = g.t;
             document.getElementById('kpi-ocupados').innerText = g.o;
             document.getElementById('kpi-livres').innerText = g.l;
             document.getElementById('kpi-isolamento').innerText = g.i;
             document.getElementById('kpi-bloqueados').innerText = g.b;
             document.getElementById('kpi-altas').innerText = g.a;
+            document.getElementById('kpi-taxa').innerText = `${taxaOcupacao}%`;
 
-            // Renderização do Dashboard com rótulos por extenso para evitar ambiguidade
             document.getElementById('sector-dashboard').innerHTML = Object.keys(porSetor).map(setor => `
                 <div class="sector-card">
                     <div class="sector-name">${setor}</div>
                     <div class="sector-stats">
-                        <div class="stat-box bg-green-50">
-                            <span class="stat-val text-green-700">${porSetor[setor].l}</span>
-                            <span class="stat-label">LIVRES</span>
-                        </div>
-                        <div class="stat-box bg-blue-50">
-                            <span class="stat-val text-blue-900">${porSetor[setor].o}</span>
-                            <span class="stat-label">OCUP</span>
-                        </div>
+                        <div class="stat-box bg-green-50"><span class="stat-val text-green-700">${porSetor[setor].l}</span><span class="stat-label">LIVRES</span></div>
+                        <div class="stat-box bg-blue-50"><span class="stat-val text-blue-900">${porSetor[setor].o}</span><span class="stat-label">OCUP</span></div>
                     </div>
                 </div>`).join('');
         }
 
         loadCenso();
-        setInterval(loadCenso, 45000); // Polling de 45s conforme melhores práticas DevOps
+        setInterval(loadCenso, 45000);
     </script>
 </body>
 </html>
