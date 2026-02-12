@@ -9,7 +9,7 @@
         * { font-family: 'Inter', sans-serif; color: #000 !important; font-weight: 900 !important; }
         body { font-size: 11px; background-color: #cbd5e1; padding-top: 110px; }
         
-        /* Arquitetura de Tabelas e Bordas */
+        /* Estrutura Fixa */
         table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 2px solid #000; }
         td, th { border: 1px solid #000 !important; padding: 8px; height: 42px; }
         
@@ -17,13 +17,17 @@
         .kpi-num { font-size: 30px; line-height: 1; }
         #main-title { position: absolute; left: 50%; transform: translateX(-50%); text-transform: uppercase; font-size: 16px; letter-spacing: 2px; }
         
+        /* Estilos de Linha */
         .setor-row { background-color: #0f172a !important; cursor: pointer; }
         .setor-text { color: #ffffff !important; font-size: 14px; text-transform: uppercase; letter-spacing: 0.2em; border: none !important; }
         .sub-header { background-color: #e2e8f0 !important; font-size: 11px; text-transform: uppercase; }
         .hidden-row { display: none !important; }
         
-        #status-menu { display: none; position: absolute; z-index: 1000; min-width: 180px; border: 3px solid #000; background: white; box-shadow: 5px 5px 0px #000; }
+        /* Menu de Status e Submenus */
+        #status-menu { display: none; position: absolute; z-index: 1000; min-width: 200px; border: 3px solid #000; background: white; box-shadow: 5px 5px 0px #000; }
         .menu-item { @apply p-3 text-[11px] uppercase cursor-pointer border-b border-black/20; }
+        .extra-container { width: 100%; margin-top: 4px; }
+        .extra-info { font-size: 8px; font-weight: 900; width: 100%; border: 1px solid rgba(0,0,0,0.1); background: rgba(255,255,255,0.5); text-align: center; text-transform: uppercase; outline: none; }
     </style>
 </head>
 <body>
@@ -44,8 +48,8 @@
     <div class="max-w-full mx-auto bg-white">
         <table>
             <colgroup>
-                <col style="width: 120px;"><col style="width: 100px;"><col style="width: 300px;">
-                <col style="width: 100px;"><col style="width: 60px;"><col style="width: 120px;"><col style="width: auto;">
+                <col style="width: 140px;"><col style="width: 100px;"><col style="width: 350px;">
+                <col style="width: 100px;"><col style="width: 80px;"><col style="width: 150px;"><col style="width: auto;">
             </colgroup>
             <tbody id="censo-body"></tbody>
         </table>
@@ -60,6 +64,8 @@
             'OCUPADO': 'bg-white', 'ALTA': 'bg-[#86EFAC]', 'ALTA PENDENTE': 'bg-[#166534]',
             'RESERVADO': 'bg-[#0EA5E9]', 'BLOQUEADO': 'bg-[#EF4444]', 'ISOLAMENTO': 'bg-[#F472B6]'
         };
+
+        const tiposIsolamento = ['KPC','PSEUDOMONAS','ACINETO','INFLUENZA','COVID','HERPES ZOSTER','CLOSTRIDIUN','TUBERCULOSE','DESORIENTADO','PSIQUIÁTRICO','DIÁLISE PERITONIAL','OUTROS'];
 
         let setoresAbertos = new Set();
         let targetCell = null;
@@ -90,17 +96,13 @@
             let lastSub = ""; 
 
             dados.forEach(item => {
-                // Ao trocar de setor (ex: do D para o A), resetamos o lastSub
                 if(item.setor !== lastSetor) {
                     lastSetor = item.setor;
-                    lastSub = ""; // Isso garante que o título apareça no topo de CADA setor
-                    
+                    lastSub = ""; 
                     const isOpen = setoresAbertos.has(lastSetor);
                     html += `
                         <tr class="setor-row" onclick="toggleSetor(this, '${lastSetor}')">
-                            <td colspan="7" class="setor-text">
-                                <span class="toggle-icon mr-4">${isOpen ? '[-]' : '[+]'}</span>${item.setor}
-                            </td>
+                            <td colspan="7" class="setor-text"><span class="toggle-icon mr-4">${isOpen ? '[-]' : '[+]'}</span>${item.setor}</td>
                         </tr>
                         <tr class="col-header ${isOpen ? '' : 'hidden-row'}">
                             <th>SITUAÇÃO</th><th>LEITO</th><th>PACIENTE</th><th>ATENDIMENTO</th><th>SEXO</th><th>ORIGEM</th><th>OBSERVAÇÃO</th>
@@ -108,26 +110,40 @@
                 }
 
                 const isVisible = setoresAbertos.has(lastSetor);
-
-                // Se mudar de categoria (ou se for o primeiro leito do setor), imprime » ENFERMARIA/APARTAMENTO
                 if(item.sub_header !== lastSub) {
                     lastSub = item.sub_header;
                     html += `<tr class="sub-header ${isVisible ? '' : 'hidden-row'}"><td colspan="7">» ${item.sub_header}</td></tr>`;
                 }
 
+                // Lógica de restauração do conteúdo extra (Isolamento/Bloqueio)
+                let extraContent = '';
+                if (item.status === 'ISOLAMENTO') {
+                    let options = tiposIsolamento.map(t => `<option value="${t}" ${item.observacao_status === t ? 'selected' : ''}>${t}</option>`).join('');
+                    extraContent = `<select class="extra-info" onchange="syncData('${item.identificador}', 'obs_s', this.value)">${options}</select>`;
+                } else if (item.status === 'BLOQUEADO') {
+                    extraContent = `<input type="text" class="extra-info" placeholder="MOTIVO..." value="${item.observacao_status || ''}" onblur="syncData('${item.identificador}', 'obs_s', this.value)">`;
+                }
+
                 html += `
                 <tr class="row-leito ${config[item.status]} ${isVisible ? '' : 'hidden-row'}" data-type="${item.tipo}" data-id="${item.identificador}">
-                    <td class="status-cell cursor-pointer text-center"><span class="status-text">${item.status}</span></td>
-                    <td class="text-center italic font-bold">${item.identificador}</td>
-                    <td contenteditable="true" onblur="syncData('${item.identificador}', 'p', this.innerText)">${item.paciente_nome || ''}</td>
-                    <td contenteditable="true" class="text-center" onblur="syncData('${item.identificador}', 'a', this.innerText)">${item.atendimento || ''}</td>
-                    <td class="p-0"><select class="bg-transparent w-full text-center outline-none" onchange="syncData('${item.identificador}', 'sx', this.value)">
+                    <td class="status-cell cursor-pointer text-center border-r border-black/10">
+                        <span class="status-text">${item.status}</span>
+                        <div class="extra-container" onclick="event.stopPropagation()">${extraContent}</div>
+                    </td>
+                    <td class="text-center italic font-bold border-r-2 border-black/20">${item.identificador}</td>
+                    <td contenteditable="true" class="uppercase px-4" onblur="syncData('${item.identificador}', 'p', this.innerText)">${item.paciente_nome || ''}</td>
+                    <td contenteditable="true" class="text-center px-4" onblur="syncData('${item.identificador}', 'a', this.innerText)">${item.atendimento || ''}</td>
+                    <td class="p-0 border-r border-black/10"><select class="bg-transparent w-full text-center outline-none" onchange="syncData('${item.identificador}', 'sx', this.value)">
                         <option value=""></option><option value="M" ${item.sexo === 'M' ? 'selected' : ''}>M</option><option value="F" ${item.sexo === 'F' ? 'selected' : ''}>F</option>
                     </select></td>
-                    <td class="p-0"><select class="bg-transparent w-full italic px-2 outline-none" onchange="syncData('${item.identificador}', 'o', this.value)">
-                        <option value=""></option><option value="PS HMS" ${item.origem === 'PS HMS' ? 'selected' : ''}>PS HMS</option><option value="EXTERNO" ${item.origem === 'EXTERNO' ? 'selected' : ''}>EXTERNO</option>
+                    <td class="p-0 border-r border-black/10"><select class="bg-transparent w-full italic px-2 outline-none" onchange="syncData('${item.identificador}', 'o', this.value)">
+                        <option value=""></option>
+                        <option value="PS HMS" ${item.origem === 'PS HMS' ? 'selected' : ''}>PS HMS</option>
+                        <option value="PS VV" ${item.origem === 'PS VV' ? 'selected' : ''}>PS VV</option>
+                        <option value="CC" ${item.origem === 'CC' ? 'selected' : ''}>CC</option>
+                        <option value="EXTERNO" ${item.origem === 'EXTERNO' ? 'selected' : ''}>EXTERNO</option>
                     </select></td>
-                    <td contenteditable="true" class="italic" onblur="syncData('${item.identificador}', 'obs', this.innerText)">${item.observacao || ''}</td>
+                    <td contenteditable="true" class="italic px-4 uppercase" onblur="syncData('${item.identificador}', 'obs', this.innerText)">${item.observacao || ''}</td>
                 </tr>`;
             });
             body.innerHTML = html;
@@ -140,20 +156,32 @@
             loadCenso(); 
         }
 
+        // Menu de Contexto Restaurado com Opções Originais
         document.addEventListener('click', (e) => {
             const cell = e.target.closest('.status-cell');
-            if (cell) {
+            if (cell && !e.target.closest('.extra-container')) {
                 targetCell = cell;
-                const isUti = cell.closest('tr').dataset.type === 'UTI';
-                let opts = isUti ? ['LIVRE','OCUPADO','ALTA','RESERVADO','BLOQUEADO','ISOLAMENTO'] : ['FORRADO','SUJO','LIMPO','OCUPADO','ALTA','BLOQUEADO'];
+                const row = targetCell.closest('tr');
+                const isUti = row.dataset.type === 'UTI';
+                
+                // Restauração das opções de menu conforme o original
+                let opts = ['OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'];
+                if (isUti) opts.unshift('LIVRE'); 
+                else opts.unshift('SUJO', 'LIMPO', 'FORRADO');
+
                 document.getElementById('menu-content').innerHTML = opts.map(o => `<div onclick="applyStatus('${o}')" class="menu-item ${config[o]}">${o}</div>`).join('');
                 const menu = document.getElementById('status-menu');
-                menu.style.display = 'block'; menu.style.top = `${e.pageY}px`; menu.style.left = `${e.pageX}px`;
-            } else { document.getElementById('status-menu').style.display = 'none'; }
+                menu.style.display = 'block';
+                menu.style.top = `${Math.min(e.pageY, document.body.scrollHeight - 450)}px`;
+                menu.style.left = `${e.pageX}px`;
+            } else if (!e.target.closest('#status-menu')) {
+                document.getElementById('status-menu').style.display = 'none';
+            }
         });
 
         window.applyStatus = (status) => {
             const row = targetCell.closest('tr');
+            // Ao mudar status, limpamos o obs_status anterior para evitar lixo
             syncData(row.dataset.id, 's', status);
             loadCenso();
             document.getElementById('status-menu').style.display = 'none';
@@ -163,11 +191,11 @@
             const statusTexts = document.querySelectorAll('.status-text');
             let total = statusTexts.length, ocup = 0, liv = 0, isol = 0, bloq = 0;
             statusTexts.forEach(span => {
-                const s = span.innerText;
+                const s = span.innerText.toUpperCase();
                 if(s === 'ISOLAMENTO') { isol++; ocup++; }
-                else if(['OCUPADO','ALTA','RESERVADO'].includes(s)) ocup++;
+                else if(['OCUPADO','ALTA','ALTA PENDENTE','RESERVADO'].includes(s)) ocup++;
                 else if(s === 'BLOQUEADO') bloq++;
-                else liv++;
+                else if(['LIVRE','SUJO','LIMPO','FORRADO'].includes(s)) liv++;
             });
             document.getElementById('kpi-total').innerText = total;
             document.getElementById('kpi-ocupados').innerText = ocup;
@@ -177,7 +205,7 @@
         }
 
         loadCenso();
-        setInterval(loadCenso, 45000); 
+        setInterval(loadCenso, 30000); 
     </script>
 </body>
 </html>
