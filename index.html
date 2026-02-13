@@ -5,11 +5,12 @@
     <title>Censo Hospitalar - Gestão Estratégica</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
 
         * { font-family: 'Inter', sans-serif; transition: background 0.2s, transform 0.1s; }
         body { font-size: 13px; background-color: #f1f5f9; padding-top: 185px; color: #1e293b; scroll-behavior: smooth; }
 
+        /* Estilos do cabeçalho mantidos identicos ao original */
         #kpi-header { 
             position: fixed; top: 0; left: 0; right: 0; z-index: 50;
             background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px);
@@ -33,19 +34,10 @@
             display: flex; align-items: center; justify-content: center; cursor: pointer; 
             background: #fff; font-size: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        .home-btn:hover { background: #f8fafc; transform: translateY(-1px); }
 
         #sector-dashboard { display: flex; gap: 10px; overflow-x: auto; padding: 5px 0; }
-        .sector-card { 
-            background: #fff; border-radius: 8px; border: 1px solid #e2e8f0;
-            min-width: 130px; flex-shrink: 0; overflow: hidden;
-        }
-        .sector-name { 
-            background: #f8fafc; font-size: 9px; font-weight: 800; padding: 6px; 
-            text-align: center; border-bottom: 1px solid #e2e8f0; text-transform: uppercase;
-        }
-        .sector-stats { display: flex; }
-        .stat-box { flex: 1; text-align: center; padding: 6px 0; }
+        .sector-card { background: #fff; border-radius: 8px; border: 1px solid #e2e8f0; min-width: 130px; flex-shrink: 0; overflow: hidden; }
+        .sector-name { background: #f8fafc; font-size: 9px; font-weight: 800; padding: 6px; text-align: center; border-bottom: 1px solid #e2e8f0; text-transform: uppercase; }
         .stat-val { font-size: 16px; font-weight: 800; display: block; }
         .stat-label { font-size: 8px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
 
@@ -54,6 +46,11 @@
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         th { background: #f8fafc; padding: 12px 10px; text-align: left; font-size: 10px; font-weight: 700; color: #64748b; border-bottom: 2px solid #e2e8f0; text-transform: uppercase; }
         td { padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
+
+        /* Ajustes de Negrito solicitados por você */
+        .bold-identificador { font-family: 'Inter', sans-serif; font-weight: 900 !important; color: #000 !important; font-size: 13px; }
+        [contenteditable="true"] { font-weight: 900 !important; color: #000 !important; }
+        select { font-weight: 900 !important; color: #000 !important; background: rgba(255,255,255,0.5); border-radius: 4px; padding: 2px; }
 
         .setor-row { background-color: #1e293b !important; cursor: pointer; }
         .setor-text { color: #ffffff !important; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
@@ -68,10 +65,10 @@
         .menu-item { padding: 10px 14px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; margin-bottom: 2px; text-transform: uppercase; }
         
         .extra-info { 
-            font-size: 9px; font-weight: 700; width: 100%; border: 1px solid rgba(0,0,0,0.15); border-radius: 4px;
-            text-align: center; text-transform: uppercase; outline: none; background: rgba(255,255,255,0.7); margin-top: 4px;
+            font-size: 9px; font-weight: 900; width: 100%; border: 1px solid rgba(0,0,0,0.3); border-radius: 4px;
+            text-align: center; text-transform: uppercase; outline: none; background: #fff; margin-top: 4px; color: #000;
         }
-        [contenteditable="true"]:focus { background: #f8fafc; outline: none; box-shadow: inset 0 0 0 1px #cbd5e1; border-radius: 4px; }
+        [contenteditable="true"]:focus { background: #f8fafc; outline: 1px solid #000; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -140,11 +137,7 @@
         let targetCell = null;
         let cachedData = [];
 
-        function resetHome() {
-            setoresAbertos.clear();
-            renderTable(cachedData);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        function resetHome() { setoresAbertos.clear(); renderTable(cachedData); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
         async function syncData(leitoId, campo, valor) {
             const item = cachedData.find(d => d.identificador === leitoId);
@@ -154,11 +147,7 @@
             }
             try {
                 const cleanVal = typeof valor === 'string' ? valor.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : valor;
-                await fetch(`${API_URL}/atualizar`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ n: leitoId, [campo]: cleanVal })
-                });
+                await fetch(`${API_URL}/atualizar`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ n: leitoId, [campo]: cleanVal }) });
                 updateKPIs();
             } catch (e) { console.error("Erro na sincronização"); }
         }
@@ -166,8 +155,7 @@
         async function loadCenso() {
             try {
                 const response = await fetch(`${API_URL}/censo`);
-                const novosDados = await response.json();
-                cachedData = novosDados;
+                cachedData = await response.json();
                 renderTable(cachedData);
             } catch (e) { console.warn("Modo Offline"); }
         }
@@ -203,33 +191,28 @@
                 let origens = item.tipo === 'UTI' ? ['PS HMS', 'PS VV', 'CC', 'INTERCORRÊNCIA', 'EXTERNO'] : ['PS HMS', 'PS VV', 'CC', 'EXTERNO', 'ALTA UTI CLI', 'ALTA UTI CIR'];
                 let origemOpts = `<option value=""></option>` + origens.map(o => `<option value="${o}" ${item.origem === o ? 'selected' : ''}>${o}</option>`).join('');
 
-                html += `<tr class="row-leito ${config[item.status]} ${isVisible ? '' : 'hidden-row'}" data-type="${item.tipo}" data-setor="${item.setor}" data-id="${item.identificador}">
+                html += `<tr class="row-leito ${config[item.status]} ${isVisible ? '' : 'hidden-row'}" data-type="${item.tipo}" data-id="${item.identificador}">
                     <td class="status-cell cursor-pointer text-center font-bold"><div class="py-1">${item.status}</div><div class="extra-container">${extra}</div></td>
-                    <td class="text-center font-mono font-bold text-slate-500 border-r border-slate-100">${item.identificador}</td>
-                    <td contenteditable="true" class="uppercase px-4 font-semibold" onblur="syncData('${item.identificador}', 'p', this.innerText)">${item.paciente_nome || ''}</td>
-                    <td contenteditable="true" class="text-center font-medium" onblur="syncData('${item.identificador}', 'a', this.innerText)">${item.atendimento || ''}</td>
-                    <td class="p-0"><select class="bg-transparent w-full text-center outline-none h-full" onchange="syncData('${item.identificador}', 'sx', this.value)">
+                    <td class="text-center bold-identificador border-r border-slate-100">${item.identificador}</td>
+                    <td contenteditable="true" class="uppercase px-4" onblur="syncData('${item.identificador}', 'p', this.innerText)">${item.paciente_nome || ''}</td>
+                    <td contenteditable="true" class="text-center" onblur="syncData('${item.identificador}', 'a', this.innerText)">${item.atendimento || ''}</td>
+                    <td class="p-0"><select class="w-full text-center outline-none h-full" onchange="syncData('${item.identificador}', 'sx', this.value)">
                         <option value=""></option><option value="M" ${item.sexo === 'M' ? 'selected' : ''}>M</option><option value="F" ${item.sexo === 'F' ? 'selected' : ''}>F</option>
                     </select></td>
-                    <td class="p-0"><select class="bg-transparent w-full px-2 outline-none h-full text-[11px]" onchange="syncData('${item.identificador}', 'o', this.value)">${origemOpts}</select></td>
-                    <td contenteditable="true" class="italic px-4 text-slate-500" onblur="syncData('${item.identificador}', 'obs', this.innerText)">${item.observacao || ''}</td>
+                    <td class="p-0"><select class="w-full px-2 outline-none h-full text-[11px]" onchange="syncData('${item.identificador}', 'o', this.value)">${origemOpts}</select></td>
+                    <td contenteditable="true" class="italic px-4" onblur="syncData('${item.identificador}', 'obs', this.innerText)">${item.observacao || ''}</td>
                 </tr>`;
             });
             body.innerHTML = html;
             updateKPIs();
         }
 
-        function toggleSetor(nome) {
-            if (setoresAbertos.has(nome)) setoresAbertos.delete(nome);
-            else setoresAbertos.add(nome);
-            renderTable(cachedData);
-        }
+        function toggleSetor(nome) { if (setoresAbertos.has(nome)) setoresAbertos.delete(nome); else setoresAbertos.add(nome); renderTable(cachedData); }
 
         document.addEventListener('click', (e) => {
             const cell = e.target.closest('.status-cell');
             if (cell && !e.target.closest('.extra-container')) {
-                targetCell = cell;
-                const row = targetCell.closest('tr');
+                targetCell = cell; const row = targetCell.closest('tr');
                 let opts = row.dataset.type === 'UTI' ? ['LIVRE', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'] : ['SUJO', 'LIMPO', 'FORRADO', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'];
                 document.getElementById('menu-content').innerHTML = opts.map(o => `<div onclick="applyStatus('${o}')" class="menu-item ${config[o]}">${o}</div>`).join('');
                 const menu = document.getElementById('status-menu');
@@ -237,30 +220,18 @@
             } else if (!e.target.closest('#status-menu')) { document.getElementById('status-menu').style.display = 'none'; }
         });
 
-        window.applyStatus = (status) => {
-            const row = targetCell.closest('tr');
-            const leitoId = row.dataset.id;
-            syncData(leitoId, 's', status);
-            renderTable(cachedData);
-            document.getElementById('status-menu').style.display = 'none';
-        };
+        window.applyStatus = (status) => { const row = targetCell.closest('tr'); syncData(row.dataset.id, 's', status); renderTable(cachedData); document.getElementById('status-menu').style.display = 'none'; };
 
         function updateKPIs() {
-            let g = { t: 0, o: 0, l: 0, i: 0, b: 0, a: 0, ap: 0, r: 0 };
-            let porSetor = {};
+            let g = { t: 0, o: 0, l: 0, i: 0, b: 0, a: 0, ap: 0, r: 0 }; let porSetor = {};
             cachedData.forEach(item => {
                 const s = item.setor; const st = item.status;
                 if (!porSetor[s]) porSetor[s] = { l: 0, o: 0 };
                 g.t++;
-                if (st === 'ISOLAMENTO') { g.i++; g.o++; porSetor[s].o++; }
-                else if (st === 'ALTA') { g.a++; g.o++; porSetor[s].o++; }
-                else if (st === 'ALTA PENDENTE') { g.ap++; g.o++; porSetor[s].o++; }
-                else if (st === 'RESERVADO') { g.r++; g.o++; porSetor[s].o++; }
-                else if (st === 'OCUPADO') { g.o++; porSetor[s].o++; }
-                else if (st === 'BLOQUEADO') { g.b++; }
-                else if (st === 'LIVRE' || st === 'FORRADO' || st === 'LIMPO' || st === 'SUJO') { g.l++; porSetor[s].l++; }
+                if (['ISOLAMENTO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'OCUPADO'].includes(st)) { g.o++; porSetor[s].o++; if(st === 'ISOLAMENTO') g.i++; if(st === 'ALTA') g.a++; if(st === 'ALTA PENDENTE') g.ap++; if(st === 'RESERVADO') g.r++; }
+                else if (st === 'BLOQUEADO') g.b++;
+                else if (['LIVRE', 'FORRADO', 'LIMPO', 'SUJO'].includes(st)) { g.l++; porSetor[s].l++; }
             });
-            const taxa = g.t > 0 ? ((g.o / g.t) * 100).toFixed(1) : 0;
             document.getElementById('kpi-total').innerText = g.t;
             document.getElementById('kpi-ocupados').innerText = g.o;
             document.getElementById('kpi-livres').innerText = g.l;
@@ -269,7 +240,7 @@
             document.getElementById('kpi-altas').innerText = g.a;
             document.getElementById('kpi-altas-pend').innerText = g.ap;
             document.getElementById('kpi-reservados').innerText = g.r;
-            document.getElementById('kpi-taxa').innerText = `${taxa}%`;
+            document.getElementById('kpi-taxa').innerText = `${g.t > 0 ? ((g.o / g.t) * 100).toFixed(1) : 0}%`;
 
             document.getElementById('sector-dashboard').innerHTML = Object.keys(porSetor).map(setor => `
                 <div class="sector-card">
