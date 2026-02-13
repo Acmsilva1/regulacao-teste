@@ -6,24 +6,16 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap');
-        
         * { font-family: 'Inter', sans-serif; color: #000 !important; font-weight: 900 !important; }
-        
         body { font-size: 11px; background-color: #cbd5e1; padding-top: 170px; scroll-behavior: smooth; }
-        
         #kpi-header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: #fff; border-bottom: 4px solid #000; padding: 15px 20px; display: flex; flex-direction: column; gap: 15px; }
-        
         .top-bar { display: flex; align-items: stretch; justify-content: space-between; width: 100%; gap: 20px; }
-        
-        /* Nova Estrutura de Tabela para KPIs */
         .kpi-grid { display: flex; border: 2px solid #000; background: #000; gap: 2px; }
         .kpi-box { background: #fff; padding: 8px 15px; display: flex; flex-direction: column; min-width: 90px; justify-content: center; }
         .kpi-num { font-size: 26px; line-height: 1; display: block; }
         .kpi-label { font-size: 8px; text-transform: uppercase; margin-bottom: 4px; display: block; }
-
         .home-btn { width: 50px; border: 3px solid #000; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #f8fafc; font-size: 24px; box-shadow: 4px 4px 0px #000; transition: all 0.1s; }
         .home-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #000; }
-
         #sector-dashboard { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
         .sector-card { border: 2px solid #000; min-width: 130px; background: #e2e8f0; flex-shrink: 0; }
         .sector-name { background: #A9A9A9; font-size: 9px; padding: 4px; text-align: center; border-bottom: 2px solid #000; text-transform: uppercase; }
@@ -32,14 +24,12 @@
         .stat-box:last-child { border-right: none; }
         .stat-val { font-size: 16px; display: block; line-height: 1; }
         .stat-label { font-size: 8px; color: #64748b; text-transform: uppercase; display: block; margin-top: 2px; }
-
         table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 2px solid #000; }
         td, th { border: 1px solid #000 !important; padding: 8px; height: 42px; }
         .setor-row { background-color: #0f172a !important; cursor: pointer; }
         .setor-text { color: #ffffff !important; font-size: 14px; text-transform: uppercase; letter-spacing: 0.2em; border: none !important; }
         .sub-header { background-color: #e2e8f0 !important; font-size: 10px; text-transform: uppercase; }
         .hidden-row { display: none !important; }
-        
         #status-menu { display: none; position: absolute; z-index: 1000; min-width: 200px; border: 3px solid #000; background: white; box-shadow: 5px 5px 0px #000; }
         .menu-item { @apply p-3 text-[11px] uppercase cursor-pointer border-b border-black/20; }
         .extra-container { width: 100%; margin-top: 4px; }
@@ -47,84 +37,46 @@
     </style>
 </head>
 <body>
-
     <div id="kpi-header">
         <div class="top-bar">
             <div class="kpi-grid">
-                <div class="kpi-box">
-                    <span class="kpi-label">Geral</span>
-                    <span id="kpi-total" class="kpi-num">0</span>
-                </div>
-                <div class="kpi-box text-blue-900">
-                    <span class="kpi-label">Ocupados</span>
-                    <span id="kpi-ocupados" class="kpi-num">0</span>
-                </div>
-                <div class="kpi-box text-green-700">
-                    <span class="kpi-label">Disponíveis</span>
-                    <span id="kpi-livres" class="kpi-num">0</span>
-                </div>
-                <div class="kpi-box text-green-600">
-                    <span class="kpi-label">Altas</span>
-                    <span id="kpi-altas" class="kpi-num">0</span>
-                </div>
-                <div class="kpi-box text-emerald-800">
-                    <span class="kpi-label">Altas Pend.</span>
-                    <span id="kpi-altas-pend" class="kpi-num">0</span>
-                </div>
-                <div class="kpi-box text-[#0EA5E9]">
-                    <span class="kpi-label">Reservados</span>
-                    <span id="kpi-reservados" class="kpi-num">0</span>
-                </div>
-                <div class="kpi-box text-pink-600">
-                    <span class="kpi-label">Isolamento</span>
-                    <span id="kpi-isolamento" class="kpi-num">0</span>
-                </div>
-                <div class="kpi-box text-red-600">
-                    <span class="kpi-label">Bloqueio</span>
-                    <span id="kpi-bloqueados" class="kpi-num">0</span>
-                </div>
-                <div class="kpi-box text-purple-700" style="background: #f8fafc;">
-                    <span class="kpi-label">Ocupação</span>
-                    <span id="kpi-taxa" class="kpi-num">0%</span>
-                </div>
+                <div class="kpi-box"><span class="kpi-label">Geral</span><span id="kpi-total" class="kpi-num">0</span></div>
+                <div class="kpi-box text-blue-900"><span class="kpi-label">Ocupados</span><span id="kpi-ocupados" class="kpi-num">0</span></div>
+                <div class="kpi-box text-green-700"><span class="kpi-label">Disponíveis</span><span id="kpi-livres" class="kpi-num">0</span></div>
+                <div class="kpi-box text-green-600"><span class="kpi-label">Altas</span><span id="kpi-altas" class="kpi-num">0</span></div>
+                <div class="kpi-box text-emerald-800"><span class="kpi-label">Altas Pend.</span><span id="kpi-altas-pend" class="kpi-num">0</span></div>
+                <div class="kpi-box text-[#0EA5E9]"><span class="kpi-label">Reservados</span><span id="kpi-reservados" class="kpi-num">0</span></div>
+                <div class="kpi-box text-pink-600"><span class="kpi-label">Isolamento</span><span id="kpi-isolamento" class="kpi-num">0</span></div>
+                <div class="kpi-box text-red-600"><span class="kpi-label">Bloqueio</span><span id="kpi-bloqueados" class="kpi-num">0</span></div>
+                <div class="kpi-box text-purple-700" style="background: #f8fafc;"><span class="kpi-label">Ocupação</span><span id="kpi-taxa" class="kpi-num">0%</span></div>
             </div>
-
             <div class="flex items-stretch gap-4">
                 <div class="flex flex-col justify-center border-l-4 border-black pl-4">
-                    <h1 class="text-[12px] uppercase leading-tight">Regulação<br>Censo Dinâmico</h1>
-                    <span class="text-[8px] opacity-50 uppercase tracking-tighter">Controle diário</span>
+                    <h1 class="text-[12px] uppercase leading-tight">Gestão de<br>Censo Hospitalar</h1>
+                    <span class="text-[8px] opacity-50 uppercase tracking-tighter">Planejamento Estratégico</span>
                 </div>
                 <div class="home-btn" onclick="resetHome()">⌂</div>
             </div>
         </div>
-        
         <div id="sector-dashboard"></div>
     </div>
-
     <div class="max-w-full mx-auto bg-white">
         <table>
-            <colgroup>
-                <col style="width: 140px;"><col style="width: 100px;"><col style="width: 350px;">
-                <col style="width: 100px;"><col style="width: 80px;"><col style="width: 150px;"><col style="width: auto;">
-            </colgroup>
+            <colgroup><col style="width: 140px;"><col style="width: 100px;"><col style="width: 350px;"><col style="width: 100px;"><col style="width: 80px;"><col style="width: 150px;"><col style="width: auto;"></colgroup>
             <tbody id="censo-body"></tbody>
         </table>
     </div>
-
     <div id="status-menu"><div id="menu-content"></div></div>
 
     <script>
         const API_URL = `${window.location.origin}/api/v1`;
-        
         const config = {
             'LIVRE': 'bg-[#FDE047]', 'SUJO': 'bg-[#FDE047]', 'LIMPO': 'bg-[#FDE047]', 'FORRADO': 'bg-[#FDE047]',
             'OCUPADO': 'bg-white', 'ALTA': 'bg-[#86EFAC]', 'ALTA PENDENTE': 'bg-[#166534]',
-            'RESERVADO': 'bg-[#0EA5E9]', 
-            'BLOQUEADO': 'bg-[#EF4444]', 'ISOLAMENTO': 'bg-[#F472B6]'
+            'RESERVADO': 'bg-[#0EA5E9]', 'BLOQUEADO': 'bg-[#EF4444]', 'ISOLAMENTO': 'bg-[#F472B6]'
         };
-
         const tiposIsolamento = ['KPC','PSEUDOMONAS','ACINETO','INFLUENZA','COVID','HERPES ZOSTER','CLOSTRIDIUN','TUBERCULOSE','DESORIENTADO','PSIQUIÁTRICO','DIÁLISE PERITONIAL','OUTROS'];
-
+        
         let setoresAbertos = new Set();
         let targetCell = null;
         let cachedData = [];
@@ -136,9 +88,15 @@
         }
 
         async function syncData(leitoId, campo, valor) {
+            // Atualização do Cache Local (Single Source of Truth) para evitar perda ao fechar setor
+            const item = cachedData.find(d => d.identificador === leitoId);
+            if (item) {
+                const mapCampos = { 'p': 'paciente_nome', 'a': 'atendimento', 'sx': 'sexo', 'o': 'origem', 'obs': 'observacao', 's': 'status', 'obs_s': 'observacao_status' };
+                item[mapCampos[campo] || campo] = valor;
+            }
+
             try {
-                const cleanVal = typeof valor === 'string' ?
-                    valor.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : valor;
+                const cleanVal = typeof valor === 'string' ? valor.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : valor;
                 await fetch(`${API_URL}/atualizar`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -151,7 +109,9 @@
         async function loadCenso() {
             try {
                 const response = await fetch(`${API_URL}/censo`);
-                cachedData = await response.json();
+                const novosDados = await response.json();
+                // Merge inteligente: preserva o que o usuário está editando se a API demorar
+                cachedData = novosDados;
                 renderTable(cachedData);
             } catch (e) { console.warn("Modo Offline"); }
         }
@@ -159,40 +119,28 @@
         function renderTable(dados) {
             const body = document.getElementById('censo-body');
             let html = ""; let lastSetor = ""; let lastSub = "";
-            
             dados.forEach(item => {
                 if(item.setor !== lastSetor) {
                     lastSetor = item.setor; lastSub = "";
                     const isOpen = setoresAbertos.has(lastSetor);
-                    html += `<tr class="setor-row" onclick="toggleSetor('${lastSetor}')"><td colspan="7" class="setor-text"><span>${isOpen ? '[-]' : '[+]'}</span> 
-                             ${lastSetor}</td></tr>
+                    html += `<tr class="setor-row" onclick="toggleSetor('${lastSetor}')"><td colspan="7" class="setor-text"><span>${isOpen ? '[-]' : '[+]'}</span> ${lastSetor}</td></tr>
                              <tr class="col-header ${isOpen ? '' : 'hidden-row'}"><th>SITUAÇÃO</th><th>LEITO</th><th>PACIENTE</th><th>ATENDIMENTO</th><th>SEXO</th><th>ORIGEM</th><th>OBSERVAÇÃO</th></tr>`;
                 }
-
                 const isVisible = setoresAbertos.has(lastSetor);
                 if(item.sub_header && item.sub_header !== lastSub) {
                     lastSub = item.sub_header;
                     html += `<tr class="sub-header ${isVisible ? '' : 'hidden-row'}"><td colspan="7">» ${item.sub_header}</td></tr>`;
                 }
-
                 let extra = '';
                 if (item.status === 'ISOLAMENTO') {
-                    let opts = tiposIsolamento.map(t => `<option value="${t}" ${item.observacao_status === t ? 'selected' : ''}>${t}</option>`).join('');
-                    extra = `<select class="extra-info" onchange="syncData('${item.identificador}', 'obs_s', this.value)">${opts}</select>`;
+                    extra = `<select class="extra-info" onchange="syncData('${item.identificador}', 'obs_s', this.value)">${tiposIsolamento.map(t => `<option value="${t}" ${item.observacao_status === t ? 'selected' : ''}>${t}</option>`).join('')}</select>`;
                 } else if (item.status === 'BLOQUEADO') {
                     extra = `<input type="text" class="extra-info" placeholder="MOTIVO..." value="${item.observacao_status || ''}" onblur="syncData('${item.identificador}', 'obs_s', this.value)">`;
                 }
-
-                let origens = item.tipo === 'UTI' ?
-                    ['PS HMS', 'PS VV', 'CC', 'INTERCORRÊNCIA', 'EXTERNO'] : ['PS HMS', 'PS VV', 'CC', 'EXTERNO', 'ALTA UTI CLI', 'ALTA UTI CIR'];
+                let origens = item.tipo === 'UTI' ? ['PS HMS', 'PS VV', 'CC', 'INTERCORRÊNCIA', 'EXTERNO'] : ['PS HMS', 'PS VV', 'CC', 'EXTERNO', 'ALTA UTI CLI', 'ALTA UTI CIR'];
                 let origemOpts = `<option value=""></option>` + origens.map(o => `<option value="${o}" ${item.origem === o ? 'selected' : ''}>${o}</option>`).join('');
-
-                html += `
-                <tr class="row-leito ${config[item.status]} ${isVisible ? '' : 'hidden-row'}" data-type="${item.tipo}" data-setor="${item.setor}" data-id="${item.identificador}">
-                    <td class="status-cell cursor-pointer text-center">
-                        <span class="status-text">${item.status}</span>
-                        <div class="extra-container">${extra}</div>
-                    </td>
+                html += `<tr class="row-leito ${config[item.status]} ${isVisible ? '' : 'hidden-row'}" data-type="${item.tipo}" data-setor="${item.setor}" data-id="${item.identificador}">
+                    <td class="status-cell cursor-pointer text-center"><span class="status-text">${item.status}</span><div class="extra-container">${extra}</div></td>
                     <td class="text-center italic font-bold border-r-2 border-black/20">${item.identificador}</td>
                     <td contenteditable="true" class="uppercase px-2" onblur="syncData('${item.identificador}', 'p', this.innerText)">${item.paciente_nome || ''}</td>
                     <td contenteditable="true" class="text-center" onblur="syncData('${item.identificador}', 'a', this.innerText)">${item.atendimento || ''}</td>
@@ -218,45 +166,31 @@
             if (cell && !e.target.closest('.extra-container')) {
                 targetCell = cell;
                 const row = targetCell.closest('tr');
-                let opts = row.dataset.type === 'UTI' ? 
-                    ['LIVRE', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'] : 
-                    ['SUJO', 'LIMPO', 'FORRADO', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'];
-
+                let opts = row.dataset.type === 'UTI' ? ['LIVRE', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'] : ['SUJO', 'LIMPO', 'FORRADO', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'];
                 document.getElementById('menu-content').innerHTML = opts.map(o => `<div onclick="applyStatus('${o}')" class="menu-item ${config[o]}">${o}</div>`).join('');
                 const menu = document.getElementById('status-menu');
                 menu.style.display = 'block'; menu.style.top = `${e.pageY}px`; menu.style.left = `${e.pageX}px`;
-            } else if (!e.target.closest('#status-menu')) {
-                document.getElementById('status-menu').style.display = 'none';
-            }
+            } else if (!e.target.closest('#status-menu')) { document.getElementById('status-menu').style.display = 'none'; }
         });
 
         window.applyStatus = (status) => {
             const row = targetCell.closest('tr');
             const leitoId = row.dataset.id;
-            const extraDiv = targetCell.querySelector('.extra-container');
-            row.className = `row-leito ${config[status]} ${row.classList.contains('hidden-row') ? 'hidden-row' : ''}`;
-            targetCell.querySelector('.status-text').innerText = status;
-            extraDiv.innerHTML = ''; 
-            if (status === 'ISOLAMENTO') {
-                extraDiv.innerHTML = `<select class="extra-info" onchange="syncData('${leitoId}', 'obs_s', this.value)">${tiposIsolamento.map(t => `<option value="${t}">${t}</option>`).join('')}</select>`;
-                syncData(leitoId, 'obs_s', tiposIsolamento[0]);
-            } else if (status === 'BLOQUEADO') {
-                extraDiv.innerHTML = `<input type="text" class="extra-info" placeholder="MOTIVO..." onblur="syncData('${leitoId}', 'obs_s', this.value)">`;
-                syncData(leitoId, 'obs_s', '');
-            } else { syncData(leitoId, 'obs_s', ''); }
+            // Atualiza localmente antes de qualquer coisa
             syncData(leitoId, 's', status);
+            // Re-renderiza a tabela para garantir que o cache e o visual estejam em sincronia
+            renderTable(cachedData);
             document.getElementById('status-menu').style.display = 'none';
-            updateKPIs();
         };
 
         function updateKPIs() {
             const rows = document.querySelectorAll('.row-leito');
             let g = { t: 0, o: 0, l: 0, i: 0, b: 0, a: 0, ap: 0, r: 0 };
             let porSetor = {};
-
-            rows.forEach(row => {
-                const s = row.dataset.setor;
-                const st = row.querySelector('.status-text').innerText;
+            // Usamos o cachedData para o cálculo para ser mais preciso que o DOM
+            cachedData.forEach(item => {
+                const s = item.setor;
+                const st = item.status;
                 if (!porSetor[s]) porSetor[s] = { l: 0, o: 0 };
                 g.t++;
                 if (st === 'ISOLAMENTO') { g.i++; g.o++; porSetor[s].o++; }
@@ -267,7 +201,6 @@
                 else if (st === 'BLOQUEADO') { g.b++; }
                 else if (st === 'LIVRE' || st === 'FORRADO') { g.l++; porSetor[s].l++; }
             });
-
             const taxa = g.t > 0 ? ((g.o / g.t) * 100).toFixed(1) : 0;
             document.getElementById('kpi-total').innerText = g.t;
             document.getElementById('kpi-ocupados').innerText = g.o;
