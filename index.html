@@ -9,21 +9,26 @@
         
         * { font-family: 'Inter', sans-serif; color: #000 !important; font-weight: 900 !important; }
         
-        body { font-size: 11px; background-color: #cbd5e1; padding-top: 150px; scroll-behavior: smooth; }
+        body { font-size: 11px; background-color: #cbd5e1; padding-top: 170px; scroll-behavior: smooth; }
         
-        #kpi-header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: #fff; border-bottom: 4px solid #000; padding: 10px 20px; display: flex; flex-direction: column; gap: 10px; }
+        #kpi-header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: #fff; border-bottom: 4px solid #000; padding: 15px 20px; display: flex; flex-direction: column; gap: 15px; }
         
-        .top-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; }
-        .kpi-num { font-size: 24px; line-height: 1; }
+        .top-bar { display: flex; align-items: stretch; justify-content: space-between; width: 100%; gap: 20px; }
         
-        .home-btn { width: 45px; height: 35px; border: 3px solid #000; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #f8fafc; font-size: 22px; box-shadow: 4px 4px 0px #000; transition: all 0.1s; }
+        /* Nova Estrutura de Tabela para KPIs */
+        .kpi-grid { display: flex; border: 2px solid #000; background: #000; gap: 2px; }
+        .kpi-box { background: #fff; padding: 8px 15px; display: flex; flex-direction: column; min-width: 90px; justify-content: center; }
+        .kpi-num { font-size: 26px; line-height: 1; display: block; }
+        .kpi-label { font-size: 8px; text-transform: uppercase; margin-bottom: 4px; display: block; }
+
+        .home-btn { width: 50px; border: 3px solid #000; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #f8fafc; font-size: 24px; box-shadow: 4px 4px 0px #000; transition: all 0.1s; }
         .home-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #000; }
 
         #sector-dashboard { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
-        .sector-card { border: 2px solid #000; min-width: 120px; background: #e2e8f0; flex-shrink: 0; }
+        .sector-card { border: 2px solid #000; min-width: 130px; background: #e2e8f0; flex-shrink: 0; }
         .sector-name { background: #A9A9A9; font-size: 9px; padding: 4px; text-align: center; border-bottom: 2px solid #000; text-transform: uppercase; }
         .sector-stats { display: flex; background: #fff; }
-        .stat-box { flex: 1; text-align: center; padding: 4px 2px; border-right: 1px solid #000; }
+        .stat-box { flex: 1; text-align: center; padding: 6px 2px; border-right: 1px solid #000; }
         .stat-box:last-child { border-right: none; }
         .stat-val { font-size: 16px; display: block; line-height: 1; }
         .stat-label { font-size: 8px; color: #64748b; text-transform: uppercase; display: block; margin-top: 2px; }
@@ -45,26 +50,54 @@
 
     <div id="kpi-header">
         <div class="top-bar">
-            <div class="flex flex-wrap gap-x-6 gap-y-2">
-                <div class="flex flex-col"><span class="text-[8px] uppercase">Geral</span><span id="kpi-total" class="kpi-num">0</span></div>
-                <div class="flex flex-col text-blue-900"><span class="text-[8px] uppercase">Ocupados</span><span id="kpi-ocupados" class="kpi-num">0</span></div>
-                <div class="flex flex-col text-green-700"><span class="text-[8px] uppercase">Disponíveis</span><span id="kpi-livres" class="kpi-num">0</span></div>
-                <div class="flex flex-col text-green-600"><span class="text-[8px] uppercase">Altas</span><span id="kpi-altas" class="kpi-num">0</span></div>
-                <div class="flex flex-col text-emerald-800"><span class="text-[8px] uppercase">Altas Pend.</span><span id="kpi-altas-pend" class="kpi-num">0</span></div>
-                <div class="flex flex-col text-[#0EA5E9]"><span class="text-[8px] uppercase">Reservados</span><span id="kpi-reservados" class="kpi-num">0</span></div>
-                <div class="flex flex-col text-pink-600"><span class="text-[8px] uppercase">Isolamento</span><span id="kpi-isolamento" class="kpi-num">0</span></div>
-                <div class="flex flex-col text-red-600"><span class="text-[8px] uppercase">Bloqueio</span><span id="kpi-bloqueados" class="kpi-num">0</span></div>
-                <div class="flex flex-col text-purple-700">
-                    <span class="text-[8px] uppercase">Ocupação</span>
+            <div class="kpi-grid">
+                <div class="kpi-box">
+                    <span class="kpi-label">Geral</span>
+                    <span id="kpi-total" class="kpi-num">0</span>
+                </div>
+                <div class="kpi-box text-blue-900">
+                    <span class="kpi-label">Ocupados</span>
+                    <span id="kpi-ocupados" class="kpi-num">0</span>
+                </div>
+                <div class="kpi-box text-green-700">
+                    <span class="kpi-label">Disponíveis</span>
+                    <span id="kpi-livres" class="kpi-num">0</span>
+                </div>
+                <div class="kpi-box text-green-600">
+                    <span class="kpi-label">Altas</span>
+                    <span id="kpi-altas" class="kpi-num">0</span>
+                </div>
+                <div class="kpi-box text-emerald-800">
+                    <span class="kpi-label">Altas Pend.</span>
+                    <span id="kpi-altas-pend" class="kpi-num">0</span>
+                </div>
+                <div class="kpi-box text-[#0EA5E9]">
+                    <span class="kpi-label">Reservados</span>
+                    <span id="kpi-reservados" class="kpi-num">0</span>
+                </div>
+                <div class="kpi-box text-pink-600">
+                    <span class="kpi-label">Isolamento</span>
+                    <span id="kpi-isolamento" class="kpi-num">0</span>
+                </div>
+                <div class="kpi-box text-red-600">
+                    <span class="kpi-label">Bloqueio</span>
+                    <span id="kpi-bloqueados" class="kpi-num">0</span>
+                </div>
+                <div class="kpi-box text-purple-700" style="background: #f8fafc;">
+                    <span class="kpi-label">Ocupação</span>
                     <span id="kpi-taxa" class="kpi-num">0%</span>
                 </div>
             </div>
 
-            <div class="flex items-center gap-6">
-                <h1 class="text-[10px] uppercase tracking-widest opacity-60 text-right leading-none">Regulação<br>de Leitos</h1>
+            <div class="flex items-stretch gap-4">
+                <div class="flex flex-col justify-center border-l-4 border-black pl-4">
+                    <h1 class="text-[12px] uppercase leading-tight">Gestão de<br>Censo Hospitalar</h1>
+                    <span class="text-[8px] opacity-50 uppercase tracking-tighter">Planejamento Estratégico</span>
+                </div>
                 <div class="home-btn" onclick="resetHome()">⌂</div>
             </div>
         </div>
+        
         <div id="sector-dashboard"></div>
     </div>
 
@@ -120,7 +153,7 @@
                 const response = await fetch(`${API_URL}/censo`);
                 cachedData = await response.json();
                 renderTable(cachedData);
-            } catch (e) { console.warn("Modo Offline ou API Indisponível"); }
+            } catch (e) { console.warn("Modo Offline"); }
         }
 
         function renderTable(dados) {
@@ -185,13 +218,9 @@
             if (cell && !e.target.closest('.extra-container')) {
                 targetCell = cell;
                 const row = targetCell.closest('tr');
-                
-                let opts;
-                if(row.dataset.type === 'UTI') {
-                    opts = ['LIVRE', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'];
-                } else {
-                    opts = ['SUJO', 'LIMPO', 'FORRADO', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'];
-                }
+                let opts = row.dataset.type === 'UTI' ? 
+                    ['LIVRE', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'] : 
+                    ['SUJO', 'LIMPO', 'FORRADO', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'];
 
                 document.getElementById('menu-content').innerHTML = opts.map(o => `<div onclick="applyStatus('${o}')" class="menu-item ${config[o]}">${o}</div>`).join('');
                 const menu = document.getElementById('status-menu');
@@ -205,21 +234,16 @@
             const row = targetCell.closest('tr');
             const leitoId = row.dataset.id;
             const extraDiv = targetCell.querySelector('.extra-container');
-            
             row.className = `row-leito ${config[status]} ${row.classList.contains('hidden-row') ? 'hidden-row' : ''}`;
             targetCell.querySelector('.status-text').innerText = status;
             extraDiv.innerHTML = ''; 
-            
             if (status === 'ISOLAMENTO') {
                 extraDiv.innerHTML = `<select class="extra-info" onchange="syncData('${leitoId}', 'obs_s', this.value)">${tiposIsolamento.map(t => `<option value="${t}">${t}</option>`).join('')}</select>`;
                 syncData(leitoId, 'obs_s', tiposIsolamento[0]);
             } else if (status === 'BLOQUEADO') {
                 extraDiv.innerHTML = `<input type="text" class="extra-info" placeholder="MOTIVO..." onblur="syncData('${leitoId}', 'obs_s', this.value)">`;
                 syncData(leitoId, 'obs_s', '');
-            } else { 
-                syncData(leitoId, 'obs_s', ''); 
-            }
-            
+            } else { syncData(leitoId, 'obs_s', ''); }
             syncData(leitoId, 's', status);
             document.getElementById('status-menu').style.display = 'none';
             updateKPIs();
@@ -235,22 +259,16 @@
                 const st = row.querySelector('.status-text').innerText;
                 if (!porSetor[s]) porSetor[s] = { l: 0, o: 0 };
                 g.t++;
-               
                 if (st === 'ISOLAMENTO') { g.i++; g.o++; porSetor[s].o++; }
                 else if (st === 'ALTA') { g.a++; g.o++; porSetor[s].o++; }
                 else if (st === 'ALTA PENDENTE') { g.ap++; g.o++; porSetor[s].o++; }
                 else if (st === 'RESERVADO') { g.r++; g.o++; porSetor[s].o++; }
                 else if (st === 'OCUPADO') { g.o++; porSetor[s].o++; }
                 else if (st === 'BLOQUEADO') { g.b++; }
-                else { 
-                    if(st === 'LIVRE' || st === 'FORRADO') {
-                        g.l++; porSetor[s].l++; 
-                    }
-                }
+                else if (st === 'LIVRE' || st === 'FORRADO') { g.l++; porSetor[s].l++; }
             });
 
-            const taxaOcupacao = g.t > 0 ? ((g.o / g.t) * 100).toFixed(1) : 0;
-
+            const taxa = g.t > 0 ? ((g.o / g.t) * 100).toFixed(1) : 0;
             document.getElementById('kpi-total').innerText = g.t;
             document.getElementById('kpi-ocupados').innerText = g.o;
             document.getElementById('kpi-livres').innerText = g.l;
@@ -259,7 +277,7 @@
             document.getElementById('kpi-altas').innerText = g.a;
             document.getElementById('kpi-altas-pend').innerText = g.ap;
             document.getElementById('kpi-reservados').innerText = g.r;
-            document.getElementById('kpi-taxa').innerText = `${taxaOcupacao}%`;
+            document.getElementById('kpi-taxa').innerText = `${taxa}%`;
 
             document.getElementById('sector-dashboard').innerHTML = Object.keys(porSetor).map(setor => `
                 <div class="sector-card">
