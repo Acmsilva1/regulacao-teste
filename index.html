@@ -34,8 +34,8 @@
         }
 
         #sector-dashboard { display: flex; gap: 10px; overflow-x: auto; padding: 5px 0; }
-        .sector-card { background: #fff; border-radius: 8px; border: 1px solid #e2e8f0; min-width: 150px; flex-shrink: 0; overflow: hidden; }
-        .sector-name { background: #f8fafc; font-size: 9px; font-weight: 800; padding: 6px; text-align: center; border-bottom: 1px solid #e2e8f0; text-transform: uppercase; }
+        .sector-card { background: #fff; border-radius: 8px; border: 1px solid #000; min-width: 150px; flex-shrink: 0; overflow: hidden; }
+        .sector-name { background: #f8fafc; font-size: 9px; font-weight: 800; padding: 6px; text-align: center; border-bottom: 1px solid #000; text-transform: uppercase; }
         
         .sector-stats { display: flex; flex-direction: row; justify-content: space-around; padding: 8px 5px; gap: 4px; }
         .stat-box { display: flex; flex-direction: column; align-items: center; flex: 1; border-radius: 4px; padding: 4px 0; }
@@ -47,7 +47,6 @@
         
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         
-        /* CABEÇALHO FIXO (STICKY) */
         thead { position: sticky; top: 184px; z-index: 40; } 
         th { 
             background: #f8fafc; padding: 14px 10px; text-align: left; 
@@ -68,10 +67,10 @@
 
         #status-menu { 
             display: none; position: absolute; z-index: 1000; min-width: 200px;
-            background: #fff; border-radius: 12px; border: 1px solid #e2e8f0;
+            background: #fff; border-radius: 12px; border: 1px solid #000;
             box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); padding: 6px;
         }
-        .menu-item { padding: 10px 14px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; margin-bottom: 2px; text-transform: uppercase; }
+        .menu-item { padding: 10px 14px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; margin-bottom: 2px; text-transform: uppercase; border: 1px solid #000; }
         .extra-info { font-size: 9px; font-weight: 900; width: 100%; border: 1px solid rgba(0,0,0,0.3); border-radius: 4px; text-align: center; text-transform: uppercase; outline: none; background: #fff; margin-top: 4px; color: #000; }
     </style>
 </head>
@@ -172,7 +171,9 @@
                 }
                 let extra = item.status === 'ISOLAMENTO' ? `<select class="extra-info" onchange="syncData('${item.identificador}', 'obs_s', this.value)">${tiposIsolamento.map(t => `<option value="${t}" ${item.observacao_status === t ? 'selected' : ''}>${t}</option>`).join('')}</select>` : item.status === 'BLOQUEADO' ? `<input type="text" class="extra-info" placeholder="Motivo..." value="${item.observacao_status || ''}" onblur="syncData('${item.identificador}', 'obs_s', this.value)">` : '';
                 let origens = item.tipo === 'UTI' ? ['PS HMS', 'PS VV', 'CC', 'INTERCORRÊNCIA', 'EXTERNO'] : ['PS HMS', 'PS VV', 'CC', 'EXTERNO', 'ALTA UTI CLI', 'ALTA UTI CIR'];
-                html += `<tr class="row-leito ${config[item.status]} ${isVisible ? '' : 'hidden-row'}" data-id="${item.identificador}">
+                
+                // DATA-SETOR ADICIONADO PARA LÓGICA DO MENU
+                html += `<tr class="row-leito ${config[item.status]} ${isVisible ? '' : 'hidden-row'}" data-id="${item.identificador}" data-type="${item.tipo}" data-setor="${item.setor}">
                     <td class="status-cell cursor-pointer text-center font-bold"><div class="py-2">${item.status}</div><div class="extra-container">${extra}</div></td>
                     <td class="text-center bold-identificador">${item.identificador}</td>
                     <td contenteditable="true" class="uppercase px-4" onblur="syncData('${item.identificador}', 'p', this.innerText)">${item.paciente_nome || ''}</td>
@@ -192,8 +193,19 @@
             const cell = e.target.closest('.status-cell');
             if (cell && !e.target.closest('.extra-container')) {
                 targetCell = cell; const row = targetCell.closest('tr');
-                let opts = ['LIVRE', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'];
-                document.getElementById('menu-content').innerHTML = opts.map(o => `<div onclick="applyStatus('${o}')" class="menu-item ${config[o]} border border-black">${o}</div>`).join('');
+                const setor = (row.dataset.setor || "").toUpperCase();
+                
+                // LÓGICA REFINADA: POSTO A,B,C,D -> SUJO/LIMPO/FORRADO | UTI -> LIVRE
+                let optionsBase = ['OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'];
+                let opts = [];
+
+                if (setor.includes("POSTO A") || setor.includes("POSTO B") || setor.includes("POSTO C") || setor.includes("POSTO D") || row.dataset.type !== 'UTI') {
+                    opts = ['SUJO', 'LIMPO', 'FORRADO', ...optionsBase];
+                } else {
+                    opts = ['LIVRE', ...optionsBase];
+                }
+                
+                document.getElementById('menu-content').innerHTML = opts.map(o => `<div onclick="applyStatus('${o}')" class="menu-item ${config[o]}">${o}</div>`).join('');
                 const menu = document.getElementById('status-menu');
                 menu.style.display = 'block'; menu.style.top = `${e.pageY}px`; menu.style.left = `${e.pageX}px`;
             } else if (!e.target.closest('#status-menu')) { document.getElementById('status-menu').style.display = 'none'; }
