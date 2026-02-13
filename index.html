@@ -5,106 +5,83 @@
     <title>Censo Hospitalar - Gestão de Alta Performance</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
         
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.95);
-            --border-main: #cbd5e1;
-        }
+        :root { --border-main: #000; }
 
-        * { font-family: 'Inter', sans-serif; }
+        * { font-family: 'Inter', sans-serif; font-weight: 700; color: #000 !important; }
         
         body { 
             font-size: 11px; 
-            background: #f1f5f9; 
+            background: #cbd5e1; 
             padding-top: 190px; 
         }
         
         #kpi-header { 
             position: fixed; top: 0; left: 0; right: 0; z-index: 50; 
-            background: var(--glass-bg); 
-            backdrop-filter: blur(12px);
-            border-bottom: 2px solid var(--border-main); 
-            padding: 20px; 
-            display: flex; flex-direction: column; gap: 15px; 
+            background: #fff; border-bottom: 4px solid var(--border-main); 
+            padding: 15px 20px; display: flex; flex-direction: column; gap: 12px; 
         }
         
-        /* Grid de KPIs */
-        .kpi-grid { display: flex; gap: 10px; flex-wrap: wrap; }
+        .kpi-grid { display: flex; gap: 8px; }
         .kpi-box { 
-            background: #fff; 
-            padding: 10px 15px; 
-            border-radius: 10px; 
-            border: 1px solid var(--border-main);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            min-width: 95px;
+            background: #fff; padding: 10px; border-radius: 8px; 
+            border: 2px solid var(--border-main); min-width: 100px;
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
         }
-        .kpi-num { font-size: 24px; font-weight: 800; color: #1e293b; line-height: 1; }
-        .kpi-label { font-size: 9px; font-weight: 700; text-transform: uppercase; color: #64748b; margin-bottom: 4px; display: block; }
+        .kpi-num { font-size: 26px; font-weight: 900; line-height: 1; }
+        .kpi-label { font-size: 9px; text-transform: uppercase; color: #444; margin-bottom: 2px; display: block; }
 
-        /* Dashboard de Setores */
-        #sector-dashboard { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
-        .sector-card { 
-            background: white; border-radius: 8px; border: 1px solid var(--border-main);
-            min-width: 130px; flex-shrink: 0;
-        }
-        .sector-name { 
-            background: #f8fafc; font-size: 9px; font-weight: 800; padding: 6px; 
-            text-align: center; border-bottom: 1px solid var(--border-main); text-transform: uppercase;
-        }
+        .sector-card { background: white; border-radius: 6px; border: 2px solid var(--border-main); min-width: 130px; flex-shrink: 0; overflow: hidden; }
+        .sector-name { background: #A9A9A9; font-size: 9px; padding: 5px; text-align: center; border-bottom: 2px solid var(--border-main); text-transform: uppercase; }
 
-        /* Tabela e Linhas de Setor */
-        .table-container { margin: 0 20px 40px; background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-main); }
+        .table-container { margin: 0 15px 40px; background: white; border: 2px solid var(--border-main); border-radius: 4px; overflow: hidden; }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         
-        /* O SEPARADOR QUE TINHA SUMIDO */
-        .setor-row { 
-            background: #1e293b !important; 
-            cursor: pointer; 
-            transition: background 0.3s;
-        }
-        .setor-row:hover { background: #334155 !important; }
-        .setor-text { color: #fff !important; font-weight: 800; font-size: 12px; padding: 15px 20px !important; text-transform: uppercase; letter-spacing: 1px; }
+        .setor-row { background: #0f172a !important; cursor: pointer; }
+        .setor-text { color: #ffffff !important; font-weight: 900; font-size: 14px; padding: 12px 20px !important; text-transform: uppercase; letter-spacing: 0.2em; }
 
-        th { background: #f8fafc; color: #475569; font-weight: 800; font-size: 9px; padding: 12px; text-align: left; border-bottom: 2px solid var(--border-main); }
-        td { padding: 10px 12px; border-bottom: 1px solid #e2e8f0; }
+        th { background: #e2e8f0; font-size: 10px; padding: 10px; text-align: left; border-bottom: 2px solid var(--border-main); border-right: 1px solid var(--border-main); }
+        td { padding: 8px; border-bottom: 1px solid var(--border-main); border-right: 1px solid var(--border-main); }
 
-        /* Cores com mais Contraste (Menos ofuscadas) */
-        .bg-livre { background-color: #fef9c3 !important; } 
+        /* CORES DE ALTA VISIBILIDADE [cite: 38] */
+        .bg-livre { background-color: #FDE047 !important; }
         .bg-ocupado { background-color: #ffffff !important; }
-        .bg-alta { background-color: #dcfce7 !important; } 
-        .bg-alta-pendente { background-color: #bbf7d0 !important; border-left: 5px solid #166534; }
-        .bg-reservado { background-color: #e0f2fe !important; }
-        .bg-bloqueado { background-color: #fee2e2 !important; border-left: 5px solid #dc2626; }
-        .bg-isolamento { background-color: #fce7f3 !important; border-left: 5px solid #db2777; }
+        .bg-alta { background-color: #86EFAC !important; }
+        .bg-alta-pendente { background-color: #166534 !important; }
+        .bg-reservado { background-color: #0EA5E9 !important; }
+        .bg-bloqueado { background-color: #EF4444 !important; }
+        .bg-isolamento { background-color: #F472B6 !important; }
+
+        .bg-alta-pendente *, .bg-reservado *, .bg-bloqueado * { color: #fff !important; }
 
         .hidden-row { display: none !important; }
         
         #status-menu { 
-            display: none; position: absolute; z-index: 1000; min-width: 180px; 
-            background: white; border-radius: 8px; border: 2px solid #000;
-            box-shadow: 8px 8px 0px rgba(0,0,0,0.1); 
+            display: none; position: absolute; z-index: 1000; min-width: 200px; 
+            background: white; border: 3px solid #000; box-shadow: 6px 6px 0px #000; 
         }
-        .menu-item { padding: 12px; font-weight: 800; cursor: pointer; border-bottom: 1px solid #f1f5f9; text-transform: uppercase; font-size: 10px; }
-        .menu-item:hover { background: #f1f5f9; }
+        .menu-item { padding: 10px; border-bottom: 1px solid #000; cursor: pointer; font-weight: 900; text-transform: uppercase; }
+        
+        .extra-info { font-size: 8px; font-weight: 900; width: 100%; border: 1px solid #000; text-align: center; background: rgba(255,255,255,0.7); outline: none; }
     </style>
 </head>
 <body>
 
     <div id="kpi-header">
-        <div class="flex justify-between items-center">
+        <div class="flex justify-between items-end">
             <div class="kpi-grid">
                 <div class="kpi-box"><span class="kpi-label">Geral</span><span id="kpi-total" class="kpi-num">0</span></div>
-                <div class="kpi-box" style="border-bottom: 4px solid #1e40af"><span class="kpi-label">Ocupados</span><span id="kpi-ocupados" class="kpi-num">0</span></div>
-                <div class="kpi-box" style="border-bottom: 4px solid #ca8a04"><span class="kpi-label">Livres</span><span id="kpi-livres" class="kpi-num">0</span></div>
-                <div class="kpi-box" style="border-bottom: 4px solid #16a34a"><span class="kpi-label">Altas</span><span id="kpi-altas" class="kpi-num">0</span></div>
-                <div class="kpi-box" style="border-bottom: 4px solid #db2777"><span class="kpi-label">Isolamento</span><span id="kpi-isolamento" class="kpi-num">0</span></div>
-                <div class="kpi-box" style="border-bottom: 4px solid #dc2626"><span class="kpi-label">Bloqueio</span><span id="kpi-bloqueados" class="kpi-num">0</span></div>
-                <div class="kpi-box" style="background: #1e293b;"><span class="kpi-label" style="color:#94a3b8">Ocupação</span><span id="kpi-taxa" class="kpi-num" style="color:#fff!important">0%</span></div>
+                <div class="kpi-box"><span class="kpi-label" style="color:#1e40af">Ocupados</span><span id="kpi-ocupados" class="kpi-num">0</span></div>
+                <div class="kpi-box"><span class="kpi-label" style="color:#854d0e">Livres</span><span id="kpi-livres" class="kpi-num">0</span></div>
+                <div class="kpi-box"><span class="kpi-label" style="color:#166534">Altas</span><span id="kpi-altas" class="kpi-num">0</span></div>
+                <div class="kpi-box"><span class="kpi-label" style="color:#9d174d">Isolam.</span><span id="kpi-isolamento" class="kpi-num">0</span></div>
+                <div class="kpi-box"><span class="kpi-label" style="color:#991b1b">Bloqueio</span><span id="kpi-bloqueados" class="kpi-num">0</span></div>
+                <div class="kpi-box" style="background: #000;"><span class="kpi-label" style="color:#fff">Ocupação</span><span id="kpi-taxa" class="kpi-num" style="color:#fff!important">0%</span></div>
             </div>
-            <div class="text-right ml-4">
-                <h1 class="text-lg font-black tracking-tighter">CENSO <span class="text-blue-600">PRO</span></h1>
-                <button onclick="resetHome()" class="bg-slate-200 p-2 rounded-lg hover:bg-slate-300">⌂ HOME</button>
+            <div class="flex flex-col items-end gap-2">
+                <h1 class="text-[12px] font-black uppercase tracking-tighter">Censo Estratégico PRO</h1>
+                <button onclick="resetHome()" class="bg-white border-2 border-black px-4 py-1 hover:bg-black hover:text-white transition-colors">⌂ HOME</button>
             </div>
         </div>
         <div id="sector-dashboard"></div>
@@ -113,7 +90,7 @@
     <div class="table-container">
         <table>
             <colgroup>
-                <col style="width: 130px;"><col style="width: 100px;"><col style="width: 300px;">
+                <col style="width: 140px;"><col style="width: 90px;"><col style="width: 320px;">
                 <col style="width: 100px;"><col style="width: 70px;"><col style="width: 130px;"><col style="width: auto;">
             </colgroup>
             <tbody id="censo-body"></tbody>
@@ -129,10 +106,28 @@
             'OCUPADO': 'bg-ocupado', 'ALTA': 'bg-alta', 'ALTA PENDENTE': 'bg-alta-pendente',
             'RESERVADO': 'bg-reservado', 'BLOQUEADO': 'bg-bloqueado', 'ISOLAMENTO': 'bg-isolamento'
         };
+        const tiposIsolamento = ['KPC','PSEUDOMONAS','ACINETO','INFLUENZA','COVID','HERPES ZOSTER','CLOSTRIDIUN','TUBERCULOSE','DESORIENTADO','PSIQUIÁTRICO','DIÁLISE PERITONIAL','OUTROS']; // [cite: 39]
         
         let setoresAbertos = new Set();
         let cachedData = [];
         let targetCell = null;
+
+        async function syncData(leitoId, campo, valor) {
+            const item = cachedData.find(d => d.identificador === leitoId); // [cite: 41]
+            if (item) {
+                const mapCampos = { 'p': 'paciente_nome', 'a': 'atendimento', 'sx': 'sexo', 'o': 'origem', 'obs': 'observacao', 's': 'status', 'obs_s': 'observacao_status' };
+                item[mapCampos[campo] || campo] = valor; // [cite: 42, 43]
+            }
+            try {
+                const cleanVal = typeof valor === 'string' ? valor.toUpperCase() : valor;
+                await fetch(`${API_URL}/atualizar`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ n: leitoId, [campo]: cleanVal })
+                });
+                updateKPIs();
+            } catch (e) { console.error("Erro Sync"); }
+        }
 
         async function loadCenso() {
             try {
@@ -144,34 +139,47 @@
 
         function renderTable(dados) {
             const body = document.getElementById('censo-body');
-            let html = ""; let lastSetor = "";
+            let html = ""; let lastSetor = ""; let lastSub = "";
             
             dados.forEach(item => {
-                // CORREÇÃO: Renderiza o cabeçalho do setor sempre que ele mudar
                 if(item.setor !== lastSetor) {
-                    lastSetor = item.setor;
+                    lastSetor = item.setor; lastSub = "";
                     const isOpen = setoresAbertos.has(lastSetor);
-                    html += `
-                        <tr class="setor-row" onclick="toggleSetor('${lastSetor}')">
-                            <td colspan="7" class="setor-text">
-                                ${isOpen ? '[-] ' : '[+] '} ${lastSetor}
-                            </td>
-                        </tr>
-                        <tr class="${isOpen ? '' : 'hidden-row'}">
-                            <th>SITUAÇÃO</th><th>LEITO</th><th>PACIENTE</th><th>ATEND.</th><th>SEXO</th><th>ORIGEM</th><th>OBSERVAÇÃO</th>
-                        </tr>`;
+                    html += `<tr class="setor-row" onclick="toggleSetor('${lastSetor}')"><td colspan="7" class="setor-text">${isOpen ? '[-] ' : '[+] '} ${lastSetor}</td></tr>
+                             <tr class="${isOpen ? '' : 'hidden-row'}"><th>SITUAÇÃO</th><th>LEITO</th><th>PACIENTE</th><th>ATEND.</th><th>SEXO</th><th>ORIGEM</th><th>OBSERVAÇÃO</th></tr>`;
                 }
 
                 const isVisible = setoresAbertos.has(lastSetor);
+                if(item.sub_header && item.sub_header !== lastSub) {
+                    lastSub = item.sub_header;
+                    html += `<tr class="bg-[#e2e8f0] ${isVisible ? '' : 'hidden-row'}"><td colspan="7" class="font-black px-4 py-1 uppercase">» ${item.sub_header}</td></tr>`;
+                }
+
+                let extra = ''; // [cite: 52]
+                if (item.status === 'ISOLAMENTO') {
+                    extra = `<select class="extra-info mt-1" onchange="syncData('${item.identificador}', 'obs_s', this.value)">${tiposIsolamento.map(t => `<option value="${t}" ${item.observacao_status === t ? 'selected' : ''}>${t}</option>`).join('')}</select>`;
+                } else if (item.status === 'BLOQUEADO') {
+                    extra = `<input type="text" class="extra-info mt-1" placeholder="MOTIVO..." value="${item.observacao_status || ''}" onblur="syncData('${item.identificador}', 'obs_s', this.value)">`;
+                }
+
+                let origens = item.tipo === 'UTI' ? ['PS HMS', 'PS VV', 'CC', 'INTERCORRÊNCIA', 'EXTERNO'] : ['PS HMS', 'PS VV', 'CC', 'EXTERNO', 'ALTA UTI CLI', 'ALTA UTI CIR']; // 
+                let origemOpts = `<option value=""></option>` + origens.map(o => `<option value="${o}" ${item.origem === o ? 'selected' : ''}>${o}</option>`).join('');
+
                 html += `
-                <tr class="row-leito ${config[item.status] || ''} ${isVisible ? '' : 'hidden-row'}" data-id="${item.identificador}">
-                    <td class="status-cell cursor-pointer text-center font-black">${item.status}</td>
-                    <td class="text-center font-bold text-slate-500 italic">${item.identificador}</td>
-                    <td contenteditable="true" class="px-2 uppercase font-semibold">${item.paciente_nome || ''}</td>
-                    <td class="text-center">${item.atendimento || ''}</td>
-                    <td class="text-center">${item.sexo || ''}</td>
-                    <td class="italic text-[10px]">${item.origem || ''}</td>
-                    <td class="italic text-[10px] text-slate-500">${item.observacao || ''}</td>
+                <tr class="row-leito ${config[item.status] || ''} ${isVisible ? '' : 'hidden-row'}" data-id="${item.identificador}" data-type="${item.tipo}">
+                    <td class="status-cell cursor-pointer text-center font-black"><div>${item.status}</div>${extra}</td>
+                    <td class="text-center font-black italic">${item.identificador}</td>
+                    <td contenteditable="true" class="px-2 uppercase font-bold" onblur="syncData('${item.identificador}', 'p', this.innerText)">${item.paciente_nome || ''}</td>
+                    <td contenteditable="true" class="text-center font-bold" onblur="syncData('${item.identificador}', 'a', this.innerText)">${item.atendimento || ''}</td>
+                    <td class="p-0">
+                        <select class="bg-transparent w-full text-center outline-none font-bold" onchange="syncData('${item.identificador}', 'sx', this.value)">
+                            <option value=""></option><option value="M" ${item.sexo === 'M' ? 'selected' : ''}>M</option><option value="F" ${item.sexo === 'F' ? 'selected' : ''}>F</option>
+                        </select>
+                    </td>
+                    <td class="p-0">
+                        <select class="bg-transparent w-full italic px-1 outline-none font-bold" onchange="syncData('${item.identificador}', 'o', this.value)">${origemOpts}</select>
+                    </td>
+                    <td contenteditable="true" class="italic px-2 uppercase font-bold" onblur="syncData('${item.identificador}', 'obs', this.innerText)">${item.observacao || ''}</td>
                 </tr>`;
             });
             body.innerHTML = html;
@@ -190,29 +198,48 @@
             window.scrollTo(0,0);
         }
 
+        document.addEventListener('click', (e) => {
+            const cell = e.target.closest('.status-cell');
+            if (cell && !e.target.closest('.extra-info')) {
+                targetCell = cell;
+                const row = targetCell.closest('tr');
+                let opts = row.dataset.type === 'UTI' ? ['LIVRE', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'] : ['SUJO', 'LIMPO', 'FORRADO', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO']; // 
+                document.getElementById('menu-content').innerHTML = opts.map(o => `<div onclick="applyStatus('${o}')" class="menu-item ${config[o]}">${o}</div>`).join('');
+                const menu = document.getElementById('status-menu');
+                menu.style.display = 'block'; menu.style.top = `${e.pageY}px`; menu.style.left = `${e.pageX}px`;
+            } else if (!e.target.closest('#status-menu')) { document.getElementById('status-menu').style.display = 'none'; }
+        });
+
+        window.applyStatus = (status) => {
+            const leitoId = targetCell.closest('tr').dataset.id;
+            syncData(leitoId, 's', status);
+            renderTable(cachedData); // [cite: 68]
+            document.getElementById('status-menu').style.display = 'none';
+        };
+
         function updateKPIs() {
-            let g = { t: 0, o: 0, l: 0, i: 0, b: 0, a: 0 };
+            let g = { t: 0, o: 0, l: 0, i: 0, b: 0, a: 0, ap: 0, r: 0 };
             let porSetor = {};
 
             cachedData.forEach(item => {
                 const s = item.setor; const st = item.status;
                 if (!porSetor[s]) porSetor[s] = { l: 0, o: 0 };
                 g.t++;
-                if (['OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'ISOLAMENTO'].includes(st)) {
-                    g.o++; porSetor[s].o++;
-                    if (st === 'ISOLAMENTO') g.i++;
-                    if (st === 'ALTA' || st === 'ALTA PENDENTE') g.a++;
-                } else if (st === 'BLOQUEADO') {
-                    g.b++;
-                } else {
-                    g.l++; porSetor[s].l++;
-                }
+                if (st === 'ISOLAMENTO') { g.i++; g.o++; porSetor[s].o++; }
+                else if (st === 'ALTA') { g.a++; g.o++; porSetor[s].o++; }
+                else if (st === 'ALTA PENDENTE') { g.ap++; g.o++; porSetor[s].o++; }
+                else if (st === 'RESERVADO') { g.r++; g.o++; porSetor[s].o++; }
+                else if (st === 'OCUPADO') { g.o++; porSetor[s].o++; }
+                else if (st === 'BLOQUEADO') { g.b++; }
+                else if (['LIVRE','FORRADO','LIMPO','SUJO'].includes(st)) { g.l++; porSetor[s].l++; } // [cite: 73]
             });
 
             document.getElementById('kpi-total').innerText = g.t;
             document.getElementById('kpi-ocupados').innerText = g.o;
             document.getElementById('kpi-livres').innerText = g.l;
             document.getElementById('kpi-altas').innerText = g.a;
+            document.getElementById('kpi-altas-pend').innerText = g.ap;
+            document.getElementById('kpi-reservados').innerText = g.r;
             document.getElementById('kpi-isolamento').innerText = g.i;
             document.getElementById('kpi-bloqueados').innerText = g.b;
             document.getElementById('kpi-taxa').innerText = g.t > 0 ? ((g.o / g.t) * 100).toFixed(1) + '%' : '0%';
@@ -220,9 +247,9 @@
             document.getElementById('sector-dashboard').innerHTML = Object.keys(porSetor).map(setor => `
                 <div class="sector-card">
                     <div class="sector-name">${setor}</div>
-                    <div class="flex text-center">
-                        <div class="flex-1 p-2 bg-green-50 text-green-700 font-bold">${porSetor[setor].l}<br><small class="text-[7px]">LIVRE</small></div>
-                        <div class="flex-1 p-2 bg-blue-50 text-blue-800 font-bold">${porSetor[setor].o}<br><small class="text-[7px]">OCUP</small></div>
+                    <div class="flex text-center border-t border-black">
+                        <div class="flex-1 p-2 bg-[#86EFAC] font-black border-r border-black">${porSetor[setor].l}<br><small class="text-[7px]">LIVRE</small></div>
+                        <div class="flex-1 p-2 bg-[#0EA5E9] font-black">${porSetor[setor].o}<br><small class="text-[7px]">OCUP</small></div>
                     </div>
                 </div>`).join('');
         }
