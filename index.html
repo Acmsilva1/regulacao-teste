@@ -5,11 +5,12 @@
     <title>Censo Hospitalar - Gestão Estratégica</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
 
         * { font-family: 'Inter', sans-serif; transition: background 0.2s, transform 0.1s; }
         body { font-size: 13px; background-color: #f1f5f9; padding-top: 185px; color: #1e293b; scroll-behavior: smooth; }
 
+        /* Cabeçalho Original Preservado */
         #kpi-header { 
             position: fixed; top: 0; left: 0; right: 0; z-index: 50;
             background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px);
@@ -38,7 +39,7 @@
         .sector-card { background: #fff; border-radius: 8px; border: 1px solid #e2e8f0; min-width: 150px; flex-shrink: 0; overflow: hidden; }
         .sector-name { background: #f8fafc; font-size: 9px; font-weight: 800; padding: 6px; text-align: center; border-bottom: 1px solid #e2e8f0; text-transform: uppercase; }
         
-        /* Ajuste: Números lado a lado e alinhados */
+        /* Dashboard de Setores Alinhado Lado a Lado */
         .sector-stats { display: flex; justify-content: center; align-items: center; background: #fff; padding: 8px 4px; gap: 12px; }
         .stat-box { display: flex; align-items: baseline; gap: 4px; }
         .stat-val { font-size: 18px; font-weight: 800; }
@@ -50,15 +51,17 @@
         th { background: #f8fafc; padding: 12px 10px; text-align: left; font-size: 10px; font-weight: 700; color: #64748b; border-bottom: 2px solid #e2e8f0; text-transform: uppercase; }
         td { padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
 
-        /* Estilo para Leito e Campos Digitáveis */
+        /* Negrito apenas nos campos solicitados */
         .bold-identificador { font-weight: 900 !important; color: #000 !important; font-size: 13px; }
         [contenteditable="true"] { font-weight: 900 !important; color: #000 !important; }
-        select { font-weight: 900 !important; color: #000 !important; }
+        select { font-weight: 900 !important; color: #000 !important; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px; }
 
         .setor-row { background-color: #1e293b !important; cursor: pointer; }
         .setor-text { color: #ffffff !important; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
         .sub-header { background-color: #f1f5f9 !important; font-size: 10px; font-weight: 800; color: #475569; }
-        
+        .hidden-row { display: none !important; }
+
+        /* Menu de Seleção Ressuscitado */
         #status-menu { 
             display: none; position: absolute; z-index: 1000; min-width: 200px;
             background: #fff; border-radius: 12px; border: 1px solid #e2e8f0;
@@ -121,7 +124,7 @@
             'SUJO': 'bg-[#eab308] text-[#422006]', 
             'LIMPO': 'bg-[#fde047] text-[#422006]', 
             'FORRADO': 'bg-[#fef08a] text-[#422006]',
-            'OCUPADO': 'bg-[#e2e8f0] text-slate-900', /* Ajustado para Cinza  */
+            'OCUPADO': 'bg-[#e2e8f0] text-slate-900', /* Cinza conforme solicitado */
             'ALTA': 'bg-[#4ade80] text-[#064e3b]', 
             'ALTA PENDENTE': 'bg-[#16a34a] text-white',
             'RESERVADO': 'bg-[#38bdf8] text-[#0c4a6e]', 
@@ -162,14 +165,33 @@
                     <td class="text-center bold-identificador border-r border-slate-100">${item.identificador}</td>
                     <td contenteditable="true" class="uppercase px-4" onblur="syncData('${item.identificador}', 'p', this.innerText)">${item.paciente_nome || ''}</td>
                     <td contenteditable="true" class="text-center" onblur="syncData('${item.identificador}', 'a', this.innerText)">${item.atendimento || ''}</td>
-                    <td class="p-0"><select class="bg-transparent w-full text-center outline-none" onchange="syncData('${item.identificador}', 'sx', this.value)"><option value=""></option><option value="M" ${item.sexo === 'M' ? 'selected' : ''}>M</option><option value="F" ${item.sexo === 'F' ? 'selected' : ''}>F</option></select></td>
-                    <td class="p-0"><select class="bg-transparent w-full px-2 outline-none text-[11px]" onchange="syncData('${item.identificador}', 'o', this.value)">${origemOpts}</select></td>
+                    <td class="p-0"><select class="bg-transparent w-full text-center outline-none h-full" onchange="syncData('${item.identificador}', 'sx', this.value)"><option value=""></option><option value="M" ${item.sexo === 'M' ? 'selected' : ''}>M</option><option value="F" ${item.sexo === 'F' ? 'selected' : ''}>F</option></select></td>
+                    <td class="p-0"><select class="bg-transparent w-full px-2 outline-none h-full text-[11px]" onchange="syncData('${item.identificador}', 'o', this.value)">${origemOpts}</select></td>
                     <td contenteditable="true" class="italic px-4" onblur="syncData('${item.identificador}', 'obs', this.innerText)">${item.observacao || ''}</td>
                 </tr>`;
             });
             body.innerHTML = html;
             updateKPIs();
         }
+
+        /* Eventos de Click para o Menu de Status - RESSUSCITADOS */
+        document.addEventListener('click', (e) => {
+            const cell = e.target.closest('.status-cell');
+            if (cell && !e.target.closest('.extra-container')) {
+                targetCell = cell; const row = targetCell.closest('tr');
+                let opts = row.dataset.type === 'UTI' ? ['LIVRE', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'] : ['SUJO', 'LIMPO', 'FORRADO', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'];
+                document.getElementById('menu-content').innerHTML = opts.map(o => `<div onclick="applyStatus('${o}')" class="menu-item ${config[o]}">${o}</div>`).join('');
+                const menu = document.getElementById('status-menu');
+                menu.style.display = 'block'; menu.style.top = `${e.pageY}px`; menu.style.left = `${e.pageX}px`;
+            } else if (!e.target.closest('#status-menu')) { document.getElementById('status-menu').style.display = 'none'; }
+        });
+
+        window.applyStatus = (status) => { 
+            const row = targetCell.closest('tr'); 
+            syncData(row.dataset.id, 's', status); 
+            renderTable(cachedData); 
+            document.getElementById('status-menu').style.display = 'none'; 
+        };
 
         function updateKPIs() {
             let g = { t: 0, o: 0, l: 0, i: 0, b: 0, a: 0, ap: 0, r: 0 }; let porSetor = {};
@@ -186,7 +208,6 @@
             document.getElementById('kpi-livres').innerText = g.l;
             document.getElementById('kpi-taxa').innerText = `${g.t > 0 ? ((g.o / g.t) * 100).toFixed(1) : 0}%`;
 
-            /* Dashboard de Setores Ajustado: Horizontal e Alinhado  */
             document.getElementById('sector-dashboard').innerHTML = Object.keys(porSetor).map(setor => `
                 <div class="sector-card">
                     <div class="sector-name">${setor}</div>
@@ -197,9 +218,23 @@
                 </div>`).join('');
         }
 
-        /* Funções syncData, loadCenso, toggleSetor mantidas conforme rascunho.txt */
+        async function syncData(leitoId, campo, valor) {
+            const item = cachedData.find(d => d.identificador === leitoId);
+            if (item) {
+                const mapCampos = { 'p': 'paciente_nome', 'a': 'atendimento', 'sx': 'sexo', 'o': 'origem', 'obs': 'observacao', 's': 'status', 'obs_s': 'observacao_status' };
+                item[mapCampos[campo] || campo] = valor;
+            }
+            try {
+                const cleanVal = typeof valor === 'string' ? valor.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : valor;
+                await fetch(`${API_URL}/atualizar`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ n: leitoId, [campo]: cleanVal }) });
+                updateKPIs();
+            } catch (e) { console.error("Erro na sincronização"); }
+        }
+
         async function loadCenso() { try { const response = await fetch(`${API_URL}/censo`); cachedData = await response.json(); renderTable(cachedData); } catch (e) { console.warn("Modo Offline"); } }
         function toggleSetor(nome) { if (setoresAbertos.has(nome)) setoresAbertos.delete(nome); else setoresAbertos.add(nome); renderTable(cachedData); }
+        function resetHome() { setoresAbertos.clear(); renderTable(cachedData); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
         loadCenso(); setInterval(loadCenso, 45000);
     </script>
 </body>
