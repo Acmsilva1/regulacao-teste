@@ -45,12 +45,18 @@
         .main-container { padding: 0 25px 40px 25px; }
         .table-card { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         
-        /* AJUSTE DE ESPAÇAMENTO DA TABELA */
         table { width: 100%; border-collapse: separate; border-spacing: 0 2px; table-layout: fixed; }
         th { background: #f8fafc; padding: 14px 10px; text-align: left; font-size: 10px; font-weight: 700; color: #64748b; border-bottom: 2px solid #e2e8f0; text-transform: uppercase; }
         td { padding: 12px 10px; border-bottom: 1px solid #f1f5f9; font-size: 12px; vertical-align: middle; }
 
-        .bold-identificador { font-weight: 900 !important; color: #000 !important; font-size: 13px; }
+        /* Ajuste para garantir dado em linha única */
+        .bold-identificador { 
+            font-weight: 900 !important; 
+            color: #000 !important; 
+            font-size: 13px; 
+            white-space: nowrap !important; 
+        }
+
         [contenteditable="true"] { font-weight: 900 !important; color: #000 !important; }
         select { font-weight: 900 !important; color: #000 !important; background: rgba(255,255,255,0.5); border-radius: 4px; padding: 2px; }
 
@@ -98,7 +104,7 @@
             <table>
                 <colgroup>
                     <col style="width: 140px;">
-                    <col style="width: 80px;">
+                    <col style="width: 110px;">
                     <col style="width: 380px;">
                     <col style="width: 110px;">
                     <col style="width: 70px;">
@@ -124,7 +130,7 @@
         };
         const tiposIsolamento = ['KPC','PSEUDOMONAS','ACINETO','INFLUENZA','COVID','HERPES ZOSTER','CLOSTRIDIUN','TUBERCULOSE','DESORIENTADO','PSIQUIÁTRICO','DIÁLISE PERITONIAL','OUTROS'];
         let setoresAbertos = new Set(), targetCell = null, cachedData = [];
-
+        
         function resetHome() { setoresAbertos.clear(); renderTable(cachedData); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
         async function syncData(leitoId, campo, valor) {
@@ -134,7 +140,8 @@
                 item[mapCampos[campo] || campo] = valor;
             }
             try {
-                const cleanVal = typeof valor === 'string' ? valor.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : valor;
+                const cleanVal = typeof valor === 'string' ?
+                valor.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : valor;
                 await fetch(`${API_URL}/atualizar`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ n: leitoId, [campo]: cleanVal }) });
                 updateKPIs();
             } catch (e) { console.error("Erro na sincronização"); }
@@ -192,9 +199,10 @@
         });
 
         window.applyStatus = (status) => { const row = targetCell.closest('tr'); syncData(row.dataset.id, 's', status); renderTable(cachedData); document.getElementById('status-menu').style.display = 'none'; };
-
+        
         function updateKPIs() {
-            let g = { t: 0, o: 0, l: 0, i: 0, b: 0, a: 0, ap: 0, r: 0 }; let porSetor = {};
+            let g = { t: 0, o: 0, l: 0, i: 0, b: 0, a: 0, ap: 0, r: 0 };
+            let porSetor = {};
             cachedData.forEach(item => {
                 const s = item.setor; const st = item.status;
                 if (!porSetor[s]) porSetor[s] = { l: 0, o: 0 };
