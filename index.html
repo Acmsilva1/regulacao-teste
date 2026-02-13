@@ -68,7 +68,7 @@
         .menu-item { padding: 10px 14px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; margin-bottom: 2px; text-transform: uppercase; }
         
         .extra-info { 
-            font-size: 9px; font-weight: 700; width: 100%; border: 1px solid #e2e8f0; border-radius: 4px;
+            font-size: 9px; font-weight: 700; width: 100%; border: 1px solid rgba(0,0,0,0.15); border-radius: 4px;
             text-align: center; text-transform: uppercase; outline: none; background: rgba(255,255,255,0.7); margin-top: 4px;
         }
         [contenteditable="true"]:focus { background: #f8fafc; outline: none; box-shadow: inset 0 0 0 1px #cbd5e1; border-radius: 4px; }
@@ -79,14 +79,14 @@
         <div class="top-bar">
             <div class="kpi-grid">
                 <div class="kpi-box"><span class="kpi-label">Geral</span><span id="kpi-total" class="kpi-num">0</span></div>
-                <div class="kpi-box"><span class="kpi-label text-blue-600">Ocupados</span><span id="kpi-ocupados" class="kpi-num text-blue-700">0</span></div>
-                <div class="kpi-box"><span class="kpi-label text-yellow-600">Disponíveis</span><span id="kpi-livres" class="kpi-num text-yellow-600">0</span></div>
-                <div class="kpi-box"><span class="kpi-label text-green-600">Altas</span><span id="kpi-altas" class="kpi-num text-green-600">0</span></div>
+                <div class="kpi-box"><span class="kpi-label text-blue-700">Ocupados</span><span id="kpi-ocupados" class="kpi-num text-blue-800">0</span></div>
+                <div class="kpi-box"><span class="kpi-label text-yellow-700">Disponíveis</span><span id="kpi-livres" class="kpi-num text-yellow-700">0</span></div>
+                <div class="kpi-box"><span class="kpi-label text-green-700">Altas</span><span id="kpi-altas" class="kpi-num text-green-700">0</span></div>
                 <div class="kpi-box"><span class="kpi-label text-emerald-800">Altas Pend.</span><span id="kpi-altas-pend" class="kpi-num text-emerald-800">0</span></div>
-                <div class="kpi-box"><span class="kpi-label text-sky-600">Reservados</span><span id="kpi-reservados" class="kpi-num text-sky-600">0</span></div>
-                <div class="kpi-box"><span class="kpi-label text-pink-600">Isolamento</span><span id="kpi-isolamento" class="kpi-num text-pink-600">0</span></div>
-                <div class="kpi-box"><span class="kpi-label text-red-600">Bloqueio</span><span id="kpi-bloqueados" class="kpi-num text-red-600">0</span></div>
-                <div class="kpi-box" style="background: #f8fafc;"><span class="kpi-label text-purple-700">Ocupação</span><span id="kpi-taxa" class="kpi-num text-purple-700">0%</span></div>
+                <div class="kpi-box"><span class="kpi-label text-sky-700">Reservados</span><span id="kpi-reservados" class="kpi-num text-sky-700">0</span></div>
+                <div class="kpi-box"><span class="kpi-label text-pink-700">Isolamento</span><span id="kpi-isolamento" class="kpi-num text-pink-700">0</span></div>
+                <div class="kpi-box"><span class="kpi-label text-red-700">Bloqueio</span><span id="kpi-bloqueados" class="kpi-num text-red-700">0</span></div>
+                <div class="kpi-box" style="background: #f8fafc;"><span class="kpi-label text-purple-800">Ocupação</span><span id="kpi-taxa" class="kpi-num text-purple-800">0%</span></div>
             </div>
             <div class="flex items-center gap-6">
                 <div class="text-right border-r pr-4 border-slate-200">
@@ -120,12 +120,18 @@
 
     <script>
         const API_URL = `${window.location.origin}/api/v1`;
+        
         const config = {
-            'LIVRE': 'bg-yellow-100 text-yellow-800', 'SUJO': 'bg-yellow-100 text-yellow-800', 
-            'LIMPO': 'bg-yellow-100 text-yellow-800', 'FORRADO': 'bg-yellow-100 text-yellow-800',
-            'OCUPADO': 'bg-white text-slate-800', 'ALTA': 'bg-green-100 text-green-800', 
-            'ALTA PENDENTE': 'bg-emerald-200 text-emerald-900', 'RESERVADO': 'bg-sky-100 text-sky-800', 
-            'BLOQUEADO': 'bg-red-100 text-red-800', 'ISOLAMENTO': 'bg-pink-100 text-pink-800'
+            'LIVRE': 'bg-[#facc15] text-[#422006]', 
+            'SUJO': 'bg-[#eab308] text-[#422006]', 
+            'LIMPO': 'bg-[#fde047] text-[#422006]', 
+            'FORRADO': 'bg-[#fef08a] text-[#422006]',
+            'OCUPADO': 'bg-white text-slate-900', 
+            'ALTA': 'bg-[#4ade80] text-[#064e3b]', 
+            'ALTA PENDENTE': 'bg-[#16a34a] text-white',
+            'RESERVADO': 'bg-[#38bdf8] text-[#0c4a6e]', 
+            'BLOQUEADO': 'bg-[#f87171] text-[#7f1d1d]', 
+            'ISOLAMENTO': 'bg-[#f472b6] text-[#702459]'
         };
 
         const tiposIsolamento = ['KPC','PSEUDOMONAS','ACINETO','INFLUENZA','COVID','HERPES ZOSTER','CLOSTRIDIUN','TUBERCULOSE','DESORIENTADO','PSIQUIÁTRICO','DIÁLISE PERITONIAL','OUTROS'];
@@ -269,7 +275,7 @@
                 <div class="sector-card">
                     <div class="sector-name">${setor}</div>
                     <div class="sector-stats">
-                        <div class="stat-box bg-yellow-50/50"><span class="stat-val text-yellow-700">${porSetor[setor].l}</span><span class="stat-label">DISP</span></div>
+                        <div class="stat-box bg-yellow-50/50"><span class="stat-val text-yellow-800">${porSetor[setor].l}</span><span class="stat-label">DISP</span></div>
                         <div class="stat-box bg-blue-50/50"><span class="stat-val text-blue-900">${porSetor[setor].o}</span><span class="stat-label">OCUP</span></div>
                     </div>
                 </div>`).join('');
