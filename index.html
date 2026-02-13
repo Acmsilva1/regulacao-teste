@@ -50,6 +50,7 @@
                 <div class="flex flex-col text-blue-900"><span class="text-[8px] uppercase">Ocupados</span><span id="kpi-ocupados" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-green-700"><span class="text-[8px] uppercase">Disponíveis</span><span id="kpi-livres" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-green-600"><span class="text-[8px] uppercase">Altas</span><span id="kpi-altas" class="kpi-num">0</span></div>
+                <div class="flex flex-col text-emerald-800"><span class="text-[8px] uppercase">Altas Pend.</span><span id="kpi-altas-pend" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-[#0EA5E9]"><span class="text-[8px] uppercase">Reservados</span><span id="kpi-reservados" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-purple-700">
                     <span class="text-[8px] uppercase">Ocupação</span>
@@ -229,7 +230,7 @@
 
         function updateKPIs() {
             const rows = document.querySelectorAll('.row-leito');
-            let g = { t: 0, o: 0, l: 0, i: 0, b: 0, a: 0, r: 0 };
+            let g = { t: 0, o: 0, l: 0, i: 0, b: 0, a: 0, ap: 0, r: 0 };
             let porSetor = {};
 
             rows.forEach(row => {
@@ -239,7 +240,8 @@
                 g.t++;
                
                 if (st === 'ISOLAMENTO') { g.i++; g.o++; porSetor[s].o++; }
-                else if (['ALTA', 'ALTA PENDENTE'].includes(st)) { g.a++; g.o++; porSetor[s].o++; }
+                else if (st === 'ALTA') { g.a++; g.o++; porSetor[s].o++; }
+                else if (st === 'ALTA PENDENTE') { g.ap++; g.o++; porSetor[s].o++; }
                 else if (st === 'RESERVADO') { g.r++; g.o++; porSetor[s].o++; }
                 else if (st === 'OCUPADO') { g.o++; porSetor[s].o++; }
                 else if (st === 'BLOQUEADO') { g.b++; }
@@ -258,6 +260,7 @@
             document.getElementById('kpi-isolamento').innerText = g.i;
             document.getElementById('kpi-bloqueados').innerText = g.b;
             document.getElementById('kpi-altas').innerText = g.a;
+            document.getElementById('kpi-altas-pend').innerText = g.ap;
             document.getElementById('kpi-reservados').innerText = g.r;
             document.getElementById('kpi-taxa').innerText = `${taxaOcupacao}%`;
 
