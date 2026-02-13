@@ -7,24 +7,18 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap');
         
-        /* [cite: 2, 3] */
         * { font-family: 'Inter', sans-serif; color: #000 !important; font-weight: 900 !important; }
         
-        /* [cite: 3, 4] */
         body { font-size: 11px; background-color: #cbd5e1; padding-top: 150px; scroll-behavior: smooth; }
         
-        /* [cite: 4, 5, 6] */
         #kpi-header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: #fff; border-bottom: 4px solid #000; padding: 10px 20px; display: flex; flex-direction: column; gap: 10px; }
         
-        /* [cite: 6, 7, 8] */
         .top-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; }
         .kpi-num { font-size: 24px; line-height: 1; }
         
-        /* [cite: 8, 9, 10, 11] */
         .home-btn { width: 45px; height: 35px; border: 3px solid #000; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #f8fafc; font-size: 22px; box-shadow: 4px 4px 0px #000; transition: all 0.1s; }
         .home-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #000; }
 
-        /* [cite: 11, 12, 13, 14, 15, 16, 17, 18, 19] */
         #sector-dashboard { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
         .sector-card { border: 2px solid #000; min-width: 120px; background: #e2e8f0; flex-shrink: 0; }
         .sector-name { background: #A9A9A9; font-size: 9px; padding: 4px; text-align: center; border-bottom: 2px solid #000; text-transform: uppercase; }
@@ -34,7 +28,6 @@
         .stat-val { font-size: 16px; display: block; line-height: 1; }
         .stat-label { font-size: 8px; color: #64748b; text-transform: uppercase; display: block; margin-top: 2px; }
 
-        /* [cite: 19, 20, 21, 22, 23, 24, 25] */
         table { width: 100%; border-collapse: collapse; table-layout: fixed; border: 2px solid #000; }
         td, th { border: 1px solid #000 !important; padding: 8px; height: 42px; }
         .setor-row { background-color: #0f172a !important; cursor: pointer; }
@@ -42,7 +35,6 @@
         .sub-header { background-color: #e2e8f0 !important; font-size: 10px; text-transform: uppercase; }
         .hidden-row { display: none !important; }
         
-        /* [cite: 25, 26, 27, 28, 29, 30] */
         #status-menu { display: none; position: absolute; z-index: 1000; min-width: 200px; border: 3px solid #000; background: white; box-shadow: 5px 5px 0px #000; }
         .menu-item { @apply p-3 text-[11px] uppercase cursor-pointer border-b border-black/20; }
         .extra-container { width: 100%; margin-top: 4px; }
@@ -90,17 +82,16 @@
     <div id="status-menu"><div id="menu-content"></div></div>
 
     <script>
-        const API_URL = `${window.location.origin}/api/v1`; // [cite: 35]
+        const API_URL = `${window.location.origin}/api/v1`;
         
-        /*  */
         const config = {
             'LIVRE': 'bg-[#FDE047]', 'SUJO': 'bg-[#FDE047]', 'LIMPO': 'bg-[#FDE047]', 'FORRADO': 'bg-[#FDE047]',
             'OCUPADO': 'bg-white', 'ALTA': 'bg-[#86EFAC]', 'ALTA PENDENTE': 'bg-[#166534]',
-            'RESERVADO': 'bg-[#0EA5E9]', // A cor azul céu solicitada
+            'RESERVADO': 'bg-[#0EA5E9]', 
             'BLOQUEADO': 'bg-[#EF4444]', 'ISOLAMENTO': 'bg-[#F472B6]'
         };
 
-        const tiposIsolamento = ['KPC','PSEUDOMONAS','ACINETO','INFLUENZA','COVID','HERPES ZOSTER','CLOSTRIDIUN','TUBERCULOSE','DESORIENTADO','PSIQUIÁTRICO','DIÁLISE PERITONIAL','OUTROS']; // [cite: 37]
+        const tiposIsolamento = ['KPC','PSEUDOMONAS','ACINETO','INFLUENZA','COVID','HERPES ZOSTER','CLOSTRIDIUN','TUBERCULOSE','DESORIENTADO','PSIQUIÁTRICO','DIÁLISE PERITONIAL','OUTROS'];
 
         let setoresAbertos = new Set();
         let targetCell = null;
@@ -109,33 +100,33 @@
         function resetHome() {
             setoresAbertos.clear();
             renderTable(cachedData);
-            window.scrollTo({ top: 0, behavior: 'smooth' }); // [cite: 38, 39]
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         async function syncData(leitoId, campo, valor) {
             try {
                 const cleanVal = typeof valor === 'string' ?
-                    valor.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : valor; // [cite: 39, 40]
+                    valor.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : valor;
                 await fetch(`${API_URL}/atualizar`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ n: leitoId, [campo]: cleanVal })
                 });
-                updateKPIs(); // [cite: 41]
+                updateKPIs();
             } catch (e) { console.error("Erro na sincronização"); }
         }
 
         async function loadCenso() {
             try {
                 const response = await fetch(`${API_URL}/censo`);
-                cachedData = await response.json(); // [cite: 41, 42]
+                cachedData = await response.json();
                 renderTable(cachedData);
             } catch (e) { console.warn("Modo Offline ou API Indisponível"); }
         }
 
         function renderTable(dados) {
             const body = document.getElementById('censo-body');
-            let html = ""; let lastSetor = ""; let lastSub = ""; // [cite: 43, 44]
+            let html = ""; let lastSetor = ""; let lastSub = "";
             
             dados.forEach(item => {
                 if(item.setor !== lastSetor) {
@@ -143,26 +134,26 @@
                     const isOpen = setoresAbertos.has(lastSetor);
                     html += `<tr class="setor-row" onclick="toggleSetor('${lastSetor}')"><td colspan="7" class="setor-text"><span>${isOpen ? '[-]' : '[+]'}</span> 
                              ${lastSetor}</td></tr>
-                             <tr class="col-header ${isOpen ? '' : 'hidden-row'}"><th>SITUAÇÃO</th><th>LEITO</th><th>PACIENTE</th><th>ATENDIMENTO</th><th>SEXO</th><th>ORIGEM</th><th>OBSERVAÇÃO</th></tr>`; // [cite: 45, 46]
+                             <tr class="col-header ${isOpen ? '' : 'hidden-row'}"><th>SITUAÇÃO</th><th>LEITO</th><th>PACIENTE</th><th>ATENDIMENTO</th><th>SEXO</th><th>ORIGEM</th><th>OBSERVAÇÃO</th></tr>`;
                 }
 
                 const isVisible = setoresAbertos.has(lastSetor);
                 if(item.sub_header && item.sub_header !== lastSub) {
                     lastSub = item.sub_header;
-                    html += `<tr class="sub-header ${isVisible ? '' : 'hidden-row'}"><td colspan="7">» ${item.sub_header}</td></tr>`; // [cite: 46, 47]
+                    html += `<tr class="sub-header ${isVisible ? '' : 'hidden-row'}"><td colspan="7">» ${item.sub_header}</td></tr>`;
                 }
 
                 let extra = '';
                 if (item.status === 'ISOLAMENTO') {
                     let opts = tiposIsolamento.map(t => `<option value="${t}" ${item.observacao_status === t ? 'selected' : ''}>${t}</option>`).join('');
-                    extra = `<select class="extra-info" onchange="syncData('${item.identificador}', 'obs_s', this.value)">${opts}</select>`; // [cite: 48, 49]
+                    extra = `<select class="extra-info" onchange="syncData('${item.identificador}', 'obs_s', this.value)">${opts}</select>`;
                 } else if (item.status === 'BLOQUEADO') {
-                    extra = `<input type="text" class="extra-info" placeholder="MOTIVO..." value="${item.observacao_status || ''}" onblur="syncData('${item.identificador}', 'obs_s', this.value)">`; // [cite: 50]
+                    extra = `<input type="text" class="extra-info" placeholder="MOTIVO..." value="${item.observacao_status || ''}" onblur="syncData('${item.identificador}', 'obs_s', this.value)">`;
                 }
 
                 let origens = item.tipo === 'UTI' ?
-                    ['PS HMS', 'PS VV', 'CC', 'INTERCORRÊNCIA', 'EXTERNO'] : ['PS HMS', 'PS VV', 'CC', 'EXTERNO', 'ALTA UTI CLI', 'ALTA UTI CIR']; // [cite: 51, 52]
-                let origemOpts = `<option value=""></option>` + origens.map(o => `<option value="${o}" ${item.origem === o ? 'selected' : ''}>${o}</option>`).join(''); // [cite: 53]
+                    ['PS HMS', 'PS VV', 'CC', 'INTERCORRÊNCIA', 'EXTERNO'] : ['PS HMS', 'PS VV', 'CC', 'EXTERNO', 'ALTA UTI CLI', 'ALTA UTI CIR'];
+                let origemOpts = `<option value=""></option>` + origens.map(o => `<option value="${o}" ${item.origem === o ? 'selected' : ''}>${o}</option>`).join('');
 
                 html += `
                 <tr class="row-leito ${config[item.status]} ${isVisible ? '' : 'hidden-row'}" data-type="${item.tipo}" data-setor="${item.setor}" data-id="${item.identificador}">
@@ -178,15 +169,15 @@
                     </select></td>
                     <td class="p-0"><select class="bg-transparent w-full italic px-1 outline-none" onchange="syncData('${item.identificador}', 'o', this.value)">${origemOpts}</select></td>
                     <td contenteditable="true" class="italic px-2 uppercase" onblur="syncData('${item.identificador}', 'obs', this.innerText)">${item.observacao || ''}</td>
-                </tr>`; // [cite: 54, 55, 56, 57, 58, 59]
+                </tr>`;
             });
-            body.innerHTML = html; // [cite: 60]
+            body.innerHTML = html;
             updateKPIs();
         }
 
         function toggleSetor(nome) {
             if (setoresAbertos.has(nome)) setoresAbertos.delete(nome);
-            else setoresAbertos.add(nome); // [cite: 60, 61]
+            else setoresAbertos.add(nome);
             renderTable(cachedData);
         }
 
@@ -195,14 +186,20 @@
             if (cell && !e.target.closest('.extra-container')) {
                 targetCell = cell;
                 const row = targetCell.closest('tr');
-                let opts = row.dataset.type === 'UTI' ? 
-                    ['LIVRE','OCUPADO','ALTA','ALTA PENDENTE','RESERVADO','BLOQUEADO','ISOLAMENTO'] : 
-                    ['SUJO','LIMPO','FORRADO','OCUPADO','ALTA','ALTA PENDENTE','BLOQUEADO','ISOLAMENTO']; // [cite: 61, 62]
+                
+                // Opção RESERVADO disponível para todos os tipos de leito
+                let opts = ['LIVRE', 'SUJO', 'LIMPO', 'FORRADO', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'];
+                
+                // Filtro básico por tipo se necessário (mantendo a flexibilidade solicitada)
+                if(row.dataset.type === 'UTI') {
+                    opts = ['LIVRE', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'];
+                }
+
                 document.getElementById('menu-content').innerHTML = opts.map(o => `<div onclick="applyStatus('${o}')" class="menu-item ${config[o]}">${o}</div>`).join('');
                 const menu = document.getElementById('status-menu');
                 menu.style.display = 'block'; menu.style.top = `${e.pageY}px`; menu.style.left = `${e.pageX}px`;
             } else if (!e.target.closest('#status-menu')) {
-                document.getElementById('status-menu').style.display = 'none'; // [cite: 62, 63]
+                document.getElementById('status-menu').style.display = 'none';
             }
         });
 
@@ -211,28 +208,29 @@
             const leitoId = row.dataset.id;
             const extraDiv = targetCell.querySelector('.extra-container');
             
-            // Aplica a classe de cor conforme o config (incluindo o azul do reservado) [cite: 64, 65]
             row.className = `row-leito ${config[status]} ${row.classList.contains('hidden-row') ? 'hidden-row' : ''}`;
             targetCell.querySelector('.status-text').innerText = status;
             extraDiv.innerHTML = ''; 
-
+            
             if (status === 'ISOLAMENTO') {
-                extraDiv.innerHTML = `<select class="extra-info" onchange="syncData('${leitoId}', 'obs_s', this.value)">${tiposIsolamento.map(t => `<option value="${t}">${t}</option>`).join('')}</select>`; // [cite: 66]
+                extraDiv.innerHTML = `<select class="extra-info" onchange="syncData('${leitoId}', 'obs_s', this.value)">${tiposIsolamento.map(t => `<option value="${t}">${t}</option>`).join('')}</select>`;
                 syncData(leitoId, 'obs_s', tiposIsolamento[0]);
             } else if (status === 'BLOQUEADO') {
-                extraDiv.innerHTML = `<input type="text" class="extra-info" placeholder="MOTIVO..." onblur="syncData('${leitoId}', 'obs_s', this.value)">`; // [cite: 67]
+                extraDiv.innerHTML = `<input type="text" class="extra-info" placeholder="MOTIVO..." onblur="syncData('${leitoId}', 'obs_s', this.value)">`;
                 syncData(leitoId, 'obs_s', '');
-            } else { syncData(leitoId, 'obs_s', ''); }
+            } else { 
+                syncData(leitoId, 'obs_s', ''); 
+            }
             
-            syncData(leitoId, 's', status); // [cite: 68]
-            document.getElementById('status-menu').style.display = 'none'; // [cite: 69]
+            syncData(leitoId, 's', status);
+            document.getElementById('status-menu').style.display = 'none';
             updateKPIs();
         };
 
         function updateKPIs() {
             const rows = document.querySelectorAll('.row-leito');
-            let g = { t: 0, o: 0, l: 0, i: 0, b: 0, a: 0 }; // [cite: 69, 70]
-            let porSetor = {}; // [cite: 71]
+            let g = { t: 0, o: 0, l: 0, i: 0, b: 0, a: 0 };
+            let porSetor = {};
 
             rows.forEach(row => {
                 const s = row.dataset.setor;
@@ -242,18 +240,18 @@
                
                 if (st === 'ISOLAMENTO') { g.i++; g.o++; porSetor[s].o++; }
                 else if (['ALTA', 'ALTA PENDENTE'].includes(st)) { g.a++; g.o++; porSetor[s].o++; }
-                else if (['OCUPADO', 'RESERVADO'].includes(st)) { g.o++; porSetor[s].o++; } // Reservado conta como ocupação estratégica [cite: 72]
+                else if (['OCUPADO', 'RESERVADO'].includes(st)) { g.o++; porSetor[s].o++; }
                 else if (st === 'BLOQUEADO') { g.b++; }
-                else { g.l++; porSetor[s].l++; } // [cite: 73]
+                else { g.l++; porSetor[s].l++; }
             });
 
-            const taxaOcupacao = g.t > 0 ? ((g.o / g.t) * 100).toFixed(1) : 0; // [cite: 73, 74]
+            const taxaOcupacao = g.t > 0 ? ((g.o / g.t) * 100).toFixed(1) : 0;
 
             document.getElementById('kpi-total').innerText = g.t;
             document.getElementById('kpi-ocupados').innerText = g.o;
             document.getElementById('kpi-livres').innerText = g.l;
             document.getElementById('kpi-isolamento').innerText = g.i;
-            document.getElementById('kpi-bloqueados').innerText = g.b; // [cite: 74, 75]
+            document.getElementById('kpi-bloqueados').innerText = g.b;
             document.getElementById('kpi-altas').innerText = g.a;
             document.getElementById('kpi-taxa').innerText = `${taxaOcupacao}%`;
 
@@ -264,11 +262,11 @@
                         <div class="stat-box bg-green-50"><span class="stat-val text-green-700">${porSetor[setor].l}</span><span class="stat-label">LIVRES</span></div>
                         <div class="stat-box bg-blue-50"><span class="stat-val text-blue-900">${porSetor[setor].o}</span><span class="stat-label">OCUP</span></div>
                     </div>
-                </div>`).join(''); // [cite: 75, 76]
+                </div>`).join('');
         }
 
         loadCenso();
-        setInterval(loadCenso, 45000); // [cite: 77]
+        setInterval(loadCenso, 45000);
     </script>
 </body>
 </html>
