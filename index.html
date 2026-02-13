@@ -45,27 +45,24 @@
 
     <div id="kpi-header">
         <div class="top-bar">
-            <div class="flex gap-4">
+            <div class="flex flex-wrap gap-x-6 gap-y-2">
                 <div class="flex flex-col"><span class="text-[8px] uppercase">Geral</span><span id="kpi-total" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-blue-900"><span class="text-[8px] uppercase">Ocupados</span><span id="kpi-ocupados" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-green-700"><span class="text-[8px] uppercase">Disponíveis</span><span id="kpi-livres" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-green-600"><span class="text-[8px] uppercase">Altas</span><span id="kpi-altas" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-emerald-800"><span class="text-[8px] uppercase">Altas Pend.</span><span id="kpi-altas-pend" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-[#0EA5E9]"><span class="text-[8px] uppercase">Reservados</span><span id="kpi-reservados" class="kpi-num">0</span></div>
+                <div class="flex flex-col text-pink-600"><span class="text-[8px] uppercase">Isolamento</span><span id="kpi-isolamento" class="kpi-num">0</span></div>
+                <div class="flex flex-col text-red-600"><span class="text-[8px] uppercase">Bloqueio</span><span id="kpi-bloqueados" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-purple-700">
                     <span class="text-[8px] uppercase">Ocupação</span>
                     <span id="kpi-taxa" class="kpi-num">0%</span>
                 </div>
             </div>
 
-            <div class="flex flex-col items-center gap-1">
-                <h1 class="text-[10px] uppercase tracking-widest opacity-60">Regulação de Leitos</h1>
+            <div class="flex items-center gap-6">
+                <h1 class="text-[10px] uppercase tracking-widest opacity-60 text-right leading-none">Regulação<br>de Leitos</h1>
                 <div class="home-btn" onclick="resetHome()">⌂</div>
-            </div>
-
-            <div class="flex gap-4">
-                <div class="flex flex-col text-pink-600"><span class="text-[8px] uppercase">Isolamento</span><span id="kpi-isolamento" class="kpi-num">0</span></div>
-                <div class="flex flex-col text-red-600"><span class="text-[8px] uppercase">Bloqueio</span><span id="kpi-bloqueados" class="kpi-num">0</span></div>
             </div>
         </div>
         <div id="sector-dashboard"></div>
