@@ -37,7 +37,6 @@
         .sector-card { background: #fff; border-radius: 8px; border: 1px solid #e2e8f0; min-width: 150px; flex-shrink: 0; overflow: hidden; }
         .sector-name { background: #f8fafc; font-size: 9px; font-weight: 800; padding: 6px; text-align: center; border-bottom: 1px solid #e2e8f0; text-transform: uppercase; }
         
-        /* KPIs do setor lado a lado */
         .sector-stats { display: flex; flex-direction: row; justify-content: space-around; padding: 8px 5px; gap: 4px; }
         .stat-box { display: flex; flex-direction: column; align-items: center; flex: 1; border-radius: 4px; padding: 4px 0; }
         .stat-val { font-size: 16px; font-weight: 800; display: block; line-height: 1; }
@@ -45,9 +44,11 @@
 
         .main-container { padding: 0 25px 40px 25px; }
         .table-card { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th { background: #f8fafc; padding: 12px 10px; text-align: left; font-size: 10px; font-weight: 700; color: #64748b; border-bottom: 2px solid #e2e8f0; text-transform: uppercase; }
-        td { padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
+        
+        /* AJUSTE DE ESPAÇAMENTO DA TABELA */
+        table { width: 100%; border-collapse: separate; border-spacing: 0 2px; table-layout: fixed; }
+        th { background: #f8fafc; padding: 14px 10px; text-align: left; font-size: 10px; font-weight: 700; color: #64748b; border-bottom: 2px solid #e2e8f0; text-transform: uppercase; }
+        td { padding: 12px 10px; border-bottom: 1px solid #f1f5f9; font-size: 12px; vertical-align: middle; }
 
         .bold-identificador { font-weight: 900 !important; color: #000 !important; font-size: 13px; }
         [contenteditable="true"] { font-weight: 900 !important; color: #000 !important; }
@@ -98,7 +99,8 @@
                 <colgroup>
                     <col style="width: 140px;">
                     <col style="width: 80px;">
-                    <col style="width: 380px;"> <col style="width: 110px;">
+                    <col style="width: 380px;">
+                    <col style="width: 110px;">
                     <col style="width: 70px;">
                     <col style="width: 140px;">
                     <col style="width: auto;">
@@ -153,17 +155,17 @@
                 if(item.setor !== lastSetor) {
                     lastSetor = item.setor; lastSub = "";
                     const isOpen = setoresAbertos.has(lastSetor);
-                    html += `<tr class="setor-row" onclick="toggleSetor('${lastSetor}')"><td colspan="7" class="setor-text text-center py-3"><span class="mr-2">${isOpen ? '▾' : '▸'}</span>${lastSetor}</td></tr>`;
+                    html += `<tr class="setor-row" onclick="toggleSetor('${lastSetor}')"><td colspan="7" class="setor-text text-center py-4"><span class="mr-2">${isOpen ? '▾' : '▸'}</span>${lastSetor}</td></tr>`;
                 }
                 const isVisible = setoresAbertos.has(lastSetor);
                 if(item.sub_header && item.sub_header !== lastSub) {
                     lastSub = item.sub_header;
-                    html += `<tr class="sub-header ${isVisible ? '' : 'hidden-row'}"><td colspan="7" class="py-2 px-4">↳ ${item.sub_header}</td></tr>`;
+                    html += `<tr class="sub-header ${isVisible ? '' : 'hidden-row'}"><td colspan="7" class="py-3 px-4">↳ ${item.sub_header}</td></tr>`;
                 }
                 let extra = item.status === 'ISOLAMENTO' ? `<select class="extra-info" onchange="syncData('${item.identificador}', 'obs_s', this.value)">${tiposIsolamento.map(t => `<option value="${t}" ${item.observacao_status === t ? 'selected' : ''}>${t}</option>`).join('')}</select>` : item.status === 'BLOQUEADO' ? `<input type="text" class="extra-info" placeholder="Motivo..." value="${item.observacao_status || ''}" onblur="syncData('${item.identificador}', 'obs_s', this.value)">` : '';
                 let origens = item.tipo === 'UTI' ? ['PS HMS', 'PS VV', 'CC', 'INTERCORRÊNCIA', 'EXTERNO'] : ['PS HMS', 'PS VV', 'CC', 'EXTERNO', 'ALTA UTI CLI', 'ALTA UTI CIR'];
                 html += `<tr class="row-leito ${config[item.status]} ${isVisible ? '' : 'hidden-row'}" data-type="${item.tipo}" data-id="${item.identificador}">
-                    <td class="status-cell cursor-pointer text-center font-bold"><div class="py-1">${item.status}</div><div class="extra-container">${extra}</div></td>
+                    <td class="status-cell cursor-pointer text-center font-bold"><div class="py-2">${item.status}</div><div class="extra-container">${extra}</div></td>
                     <td class="text-center bold-identificador border-r border-slate-100">${item.identificador}</td>
                     <td contenteditable="true" class="uppercase px-4" onblur="syncData('${item.identificador}', 'p', this.innerText)">${item.paciente_nome || ''}</td>
                     <td contenteditable="true" class="text-center" onblur="syncData('${item.identificador}', 'a', this.innerText)">${item.atendimento || ''}</td>
