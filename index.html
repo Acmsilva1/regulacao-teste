@@ -39,25 +39,25 @@
         .table-card { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         
-        /* Cabeçalho fixo desativado em favor dos repetíveis por setor */
-        .header-main th { background: #f8fafc; padding: 12px 10px; text-align: left; font-size: 10px; font-weight: 700; color: #64748b; border-bottom: 2px solid #e2e8f0; text-transform: uppercase; }
-        
-        /* Estilo do Cabeçalho Interno dos Setores */
-        .sector-internal-header { background-color: #e2e8f0; color: #475569; font-size: 10px; font-weight: 900; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; }
-        .sector-internal-header td { padding: 6px 10px !important; }
+        /* Cabeçalho Interno Estreito */
+        .sector-internal-header { background-color: #e2e8f0; color: #475569; font-size: 9px; font-weight: 900; text-transform: uppercase; }
+        .sector-internal-header td { padding: 4px 8px !important; border-bottom: 1px solid #cbd5e1; }
 
+        /* Estilos de Células */
         .bold-identificador { font-weight: 900 !important; color: #000; }
-        [contenteditable="true"] { font-weight: 900 !important; color: #000; outline: none; }
-        select { font-weight: 900 !important; color: #000; background: transparent; }
+        [contenteditable="true"] { font-weight: 900 !important; color: #000; outline: none; white-space: nowrap; overflow: hidden; }
+        .obs-cell { white-space: normal !important; line-height: 1.2; font-weight: 600 !important; }
+        
+        select { font-weight: 900 !important; color: #000; background: transparent; width: 100%; }
 
         .setor-row { background-color: #1e293b !important; cursor: pointer; color: #fff !important; }
         
         #status-menu { 
-            display: none; position: absolute; z-index: 1000; min-width: 200px;
+            display: none; position: absolute; z-index: 1000; min-width: 180px;
             background: #fff; border-radius: 12px; border: 1px solid #e2e8f0;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 6px;
         }
-        .menu-item { padding: 10px 14px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; margin-bottom: 2px; text-transform: uppercase; }
+        .menu-item { padding: 8px 12px; border-radius: 6px; font-size: 10px; font-weight: 700; cursor: pointer; margin-bottom: 2px; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -88,6 +88,8 @@
     <div class="main-container">
         <div class="table-card">
             <table id="main-table">
+                <colgroup>
+                    <col style="width: 100px;"> <col style="width: 60px;">  <col style="width: 200px;"> <col style="width: 90px;">  <col style="width: 45px;">  <col style="width: 110px;"> <col style="width: auto;">  </colgroup>
                 <tbody id="censo-body"></tbody>
             </table>
         </div>
@@ -153,13 +155,13 @@
                 if(item.setor !== lastSetor) {
                     lastSetor = item.setor; lastSub = "";
                     const isOpen = setoresAbertos.has(lastSetor);
-                    html += `<tr class="setor-row" onclick="toggleSetor('${lastSetor}')"><td colspan="7" class="text-center py-3 font-bold uppercase">${isOpen ? '▾' : '▸'} ${lastSetor}</td></tr>`;
+                    html += `<tr class="setor-row" onclick="toggleSetor('${lastSetor}')"><td colspan="7" class="text-center py-2 font-bold uppercase text-[12px] tracking-widest">${isOpen ? '▾' : '▸'} ${lastSetor}</td></tr>`;
                     
                     if(isOpen) {
                         html += `<tr class="sector-internal-header">
-                            <td class="text-center" style="width:140px">Situação</td><td class="text-center" style="width:80px">Leito</td>
-                            <td style="width:300px">Paciente</td><td class="text-center" style="width:110px">Atendimento</td>
-                            <td class="text-center" style="width:70px">Sexo</td><td style="width:140px">Origem</td><td>Observação</td>
+                            <td class="text-center">Status</td><td class="text-center">Leito</td>
+                            <td>Paciente</td><td class="text-center">Atend</td>
+                            <td class="text-center">Sx</td><td>Origem</td><td>Observação</td>
                         </tr>`;
                     }
                 }
@@ -167,17 +169,17 @@
 
                 if(item.sub_header && item.sub_header !== lastSub) {
                     lastSub = item.sub_header;
-                    html += `<tr class="sub-header bg-slate-100 font-bold"><td colspan="7" class="py-2 px-4 text-[10px]">↳ ${item.sub_header}</td></tr>`;
+                    html += `<tr class="sub-header bg-slate-50 font-bold border-b border-slate-200"><td colspan="7" class="py-1.5 px-4 text-[10px] text-slate-500">↳ ${item.sub_header}</td></tr>`;
                 }
 
-                html += `<tr class="row-leito ${config[item.status]}" data-id="${item.identificador}">
-                    <td class="status-cell cursor-pointer text-center font-bold py-3" onclick="openMenu(event, '${item.identificador}', '${item.tipo}')">${item.status}</td>
-                    <td class="text-center bold-identificador border-r border-slate-200">${item.identificador}</td>
-                    <td contenteditable="true" class="px-4" onblur="syncData('${item.identificador}', 'p', this.innerText)">${item.paciente_nome || ''}</td>
-                    <td contenteditable="true" class="text-center" onblur="syncData('${item.identificador}', 'a', this.innerText)">${item.atendimento || ''}</td>
-                    <td class="p-0"><select class="w-full text-center h-full outline-none" onchange="syncData('${item.identificador}', 'sx', this.value)"><option value=""></option><option value="M" ${item.sexo === 'M' ? 'selected' : ''}>M</option><option value="F" ${item.sexo === 'F' ? 'selected' : ''}>F</option></select></td>
-                    <td class="p-0"><select class="w-full px-2 h-full outline-none text-[11px]" onchange="syncData('${item.identificador}', 'o', this.value)"><option value=""></option>${(item.tipo === 'UTI' ? ['PS HMS', 'PS VV', 'CC', 'EXTERNO'] : ['PS HMS', 'PS VV', 'CC', 'EXTERNO', 'ALTA UTI']).map(o => `<option value="${o}" ${item.origem === o ? 'selected' : ''}>${o}</option>`).join('')}</select></td>
-                    <td contenteditable="true" class="italic px-4" onblur="syncData('${item.identificador}', 'obs', this.innerText)">${item.observacao || ''}</td>
+                html += `<tr class="row-leito ${config[item.status]} border-b border-white/20" data-id="${item.identificador}">
+                    <td class="status-cell cursor-pointer text-center font-bold py-2.5 text-[11px]" onclick="openMenu(event, '${item.identificador}', '${item.tipo}')">${item.status}</td>
+                    <td class="text-center bold-identificador border-r border-black/5">${item.identificador}</td>
+                    <td contenteditable="true" class="px-3 uppercase text-[12px]" onblur="syncData('${item.identificador}', 'p', this.innerText)">${item.paciente_nome || ''}</td>
+                    <td contenteditable="true" class="text-center text-[12px]" onblur="syncData('${item.identificador}', 'a', this.innerText)">${item.atendimento || ''}</td>
+                    <td class="p-0"><select class="text-center h-full outline-none" onchange="syncData('${item.identificador}', 'sx', this.value)"><option value=""></option><option value="M" ${item.sexo === 'M' ? 'selected' : ''}>M</option><option value="F" ${item.sexo === 'F' ? 'selected' : ''}>F</option></select></td>
+                    <td class="p-0"><select class="px-1 h-full outline-none text-[10px]" onchange="syncData('${item.identificador}', 'o', this.value)"><option value=""></option>${(item.tipo === 'UTI' ? ['PS HMS', 'PS VV', 'CC', 'EXTERNO'] : ['PS HMS', 'PS VV', 'CC', 'EXTERNO', 'ALTA UTI']).map(o => `<option value="${o}" ${item.origem === o ? 'selected' : ''}>${o}</option>`).join('')}</select></td>
+                    <td contenteditable="true" class="obs-cell px-3 italic text-[12px]" onblur="syncData('${item.identificador}', 'obs', this.innerText)">${item.observacao || ''}</td>
                 </tr>`;
             });
             body.innerHTML = html;
