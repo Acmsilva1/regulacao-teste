@@ -9,7 +9,6 @@
         * { font-family: 'Inter', sans-serif; transition: background 0.2s; }
         body { font-size: 13px; background-color: #f1f5f9; padding-top: 185px; color: #1e293b; }
 
-        /* Cabeçalho Fixo */
         #kpi-header { 
             position: fixed; top: 0; left: 0; right: 0; z-index: 50;
             background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px);
@@ -31,7 +30,6 @@
         .sector-card { background: #fff; border-radius: 8px; border: 1px solid #e2e8f0; min-width: 160px; flex-shrink: 0; }
         .sector-name { background: #f8fafc; font-size: 9px; font-weight: 800; padding: 6px; text-align: center; border-bottom: 1px solid #e2e8f0; text-transform: uppercase; }
         
-        /* Alinhamento Horizontal dos Setores */
         .sector-stats { display: flex; justify-content: space-around; padding: 8px 10px; }
         .stat-box { display: flex; align-items: baseline; gap: 4px; }
         .stat-val { font-size: 18px; font-weight: 800; }
@@ -40,17 +38,20 @@
         .main-container { padding: 0 25px 40px 25px; }
         .table-card { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th { background: #f8fafc; padding: 12px 10px; text-align: left; font-size: 10px; font-weight: 700; color: #64748b; border-bottom: 2px solid #e2e8f0; text-transform: uppercase; }
-        td { padding: 10px; border-bottom: 1px solid #f1f5f9; }
+        
+        /* Cabeçalho fixo desativado em favor dos repetíveis por setor */
+        .header-main th { background: #f8fafc; padding: 12px 10px; text-align: left; font-size: 10px; font-weight: 700; color: #64748b; border-bottom: 2px solid #e2e8f0; text-transform: uppercase; }
+        
+        /* Estilo do Cabeçalho Interno dos Setores */
+        .sector-internal-header { background-color: #e2e8f0; color: #475569; font-size: 10px; font-weight: 900; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; }
+        .sector-internal-header td { padding: 6px 10px !important; }
 
-        /* Negritos e Destaques */
         .bold-identificador { font-weight: 900 !important; color: #000; }
         [contenteditable="true"] { font-weight: 900 !important; color: #000; outline: none; }
         select { font-weight: 900 !important; color: #000; background: transparent; }
 
         .setor-row { background-color: #1e293b !important; cursor: pointer; color: #fff !important; }
-        .hidden-row { display: none !important; }
-
+        
         #status-menu { 
             display: none; position: absolute; z-index: 1000; min-width: 200px;
             background: #fff; border-radius: 12px; border: 1px solid #e2e8f0;
@@ -86,10 +87,7 @@
 
     <div class="main-container">
         <div class="table-card">
-            <table>
-                <thead>
-                    <tr><th style="width:140px">Situação</th><th style="width:80px">Leito</th><th style="width:300px">Paciente</th><th style="width:110px">Atendimento</th><th style="width:70px">Sexo</th><th style="width:140px">Origem</th><th>Observação</th></tr>
-                </thead>
+            <table id="main-table">
                 <tbody id="censo-body"></tbody>
             </table>
         </div>
@@ -117,23 +115,14 @@
 
         function updateKPIs() {
             let g = { t: 0, o: 0, l: 0, i: 0, b: 0, a: 0, ap: 0, r: 0 }, porSetor = {};
-            
             cachedData.forEach(item => {
                 const s = item.setor, st = item.status;
                 if (!porSetor[s]) porSetor[s] = { l: 0, o: 0 };
                 g.t++;
-                // Lógica de contagem corrigida
                 if (['OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'ISOLAMENTO'].includes(st)) {
                     g.o++; porSetor[s].o++;
-                    if(st === 'ALTA') g.a++;
-                    if(st === 'ALTA PENDENTE') g.ap++;
-                    if(st === 'RESERVADO') g.r++;
-                    if(st === 'ISOLAMENTO') g.i++;
-                } else if (st === 'BLOQUEADO') {
-                    g.b++;
-                } else {
-                    g.l++; porSetor[s].l++;
-                }
+                    if(st === 'ALTA') g.a++; if(st === 'ALTA PENDENTE') g.ap++; if(st === 'RESERVADO') g.r++; if(st === 'ISOLAMENTO') g.i++;
+                } else if (st === 'BLOQUEADO') { g.b++; } else { g.l++; porSetor[s].l++; }
             });
 
             document.getElementById('kpi-total').innerText = g.t;
@@ -163,7 +152,16 @@
             cachedData.forEach(item => {
                 if(item.setor !== lastSetor) {
                     lastSetor = item.setor; lastSub = "";
-                    html += `<tr class="setor-row" onclick="toggleSetor('${lastSetor}')"><td colspan="7" class="text-center py-3 font-bold uppercase"> ${setoresAbertos.has(lastSetor) ? '▾' : '▸'} ${lastSetor}</td></tr>`;
+                    const isOpen = setoresAbertos.has(lastSetor);
+                    html += `<tr class="setor-row" onclick="toggleSetor('${lastSetor}')"><td colspan="7" class="text-center py-3 font-bold uppercase">${isOpen ? '▾' : '▸'} ${lastSetor}</td></tr>`;
+                    
+                    if(isOpen) {
+                        html += `<tr class="sector-internal-header">
+                            <td class="text-center" style="width:140px">Situação</td><td class="text-center" style="width:80px">Leito</td>
+                            <td style="width:300px">Paciente</td><td class="text-center" style="width:110px">Atendimento</td>
+                            <td class="text-center" style="width:70px">Sexo</td><td style="width:140px">Origem</td><td>Observação</td>
+                        </tr>`;
+                    }
                 }
                 if (!setoresAbertos.has(lastSetor)) return;
 
@@ -197,21 +195,21 @@
 
         window.applyStatus = (status) => {
             const item = cachedData.find(d => d.identificador === targetId);
-            if (item) item.status = status; // Atualiza o cache local IMEDIATAMENTE
+            if (item) item.status = status;
             syncData(targetId, 's', status);
             renderTable();
             document.getElementById('status-menu').style.display = 'none';
         };
 
         async function syncData(id, campo, valor) {
-            const item = cachedData.find(d => d.identificador === id);
-            if (item) {
-                const map = { 'p': 'paciente_nome', 'a': 'atendimento', 'sx': 'sexo', 'o': 'origem', 'obs': 'observacao', 's': 'status' };
-                item[map[campo] || campo] = valor.toUpperCase();
-            }
             try {
+                const item = cachedData.find(d => d.identificador === id);
+                if (item) {
+                    const map = { 'p': 'paciente_nome', 'a': 'atendimento', 'sx': 'sexo', 'o': 'origem', 'obs': 'observacao', 's': 'status' };
+                    item[map[campo] || campo] = valor.toUpperCase();
+                }
                 await fetch(`${API_URL}/atualizar`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ n: id, [campo]: valor }) });
-                updateKPIs(); // Recalcula KPIs após o envio
+                updateKPIs();
             } catch (e) {}
         }
 
