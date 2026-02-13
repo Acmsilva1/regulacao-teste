@@ -6,58 +6,69 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
-        * { font-family: 'Inter', sans-serif; transition: background 0.2s; }
-        body { font-size: 13px; background-color: #f1f5f9; padding-top: 185px; color: #1e293b; }
 
+        * { font-family: 'Inter', sans-serif; transition: background 0.2s, transform 0.1s; }
+        body { font-size: 13px; background-color: #f1f5f9; padding-top: 185px; color: #1e293b; scroll-behavior: smooth; }
+
+        /* Estilos do cabeçalho mantidos identicos ao original */
         #kpi-header { 
             position: fixed; top: 0; left: 0; right: 0; z-index: 50;
-            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px);
             border-bottom: 1px solid #e2e8f0; padding: 15px 25px; 
+            box-shadow: 0 4px 12px -2px rgba(0,0,0,0.05);
             display: flex; flex-direction: column; gap: 12px;
         }
 
         .top-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 20px; }
-        .kpi-grid { display: flex; gap: 8px; flex-wrap: nowrap; }
+        .kpi-grid { display: flex; gap: 10px; flex-wrap: nowrap; }
         .kpi-box { 
-            background: #fff; padding: 10px 14px; border-radius: 10px;
-            border: 1px solid #e2e8f0; min-width: 95px;
+            background: #fff; padding: 10px 16px; border-radius: 10px;
+            border: 1px solid #e2e8f0; min-width: 100px;
             display: flex; flex-direction: column; justify-content: center;
         }
         .kpi-num { font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.1; }
-        .kpi-label { font-size: 9px; font-weight: 600; text-transform: uppercase; color: #64748b; }
+        .kpi-label { font-size: 9px; font-weight: 600; text-transform: uppercase; color: #64748b; margin-bottom: 2px; }
+
+        .home-btn { 
+            width: 45px; height: 45px; border-radius: 10px; border: 1px solid #e2e8f0; 
+            display: flex; align-items: center; justify-content: center; cursor: pointer; 
+            background: #fff; font-size: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
 
         #sector-dashboard { display: flex; gap: 10px; overflow-x: auto; padding: 5px 0; }
-        .sector-card { background: #fff; border-radius: 8px; border: 1px solid #e2e8f0; min-width: 160px; flex-shrink: 0; }
+        .sector-card { background: #fff; border-radius: 8px; border: 1px solid #e2e8f0; min-width: 130px; flex-shrink: 0; overflow: hidden; }
         .sector-name { background: #f8fafc; font-size: 9px; font-weight: 800; padding: 6px; text-align: center; border-bottom: 1px solid #e2e8f0; text-transform: uppercase; }
-        
-        .sector-stats { display: flex; justify-content: space-around; padding: 8px 10px; }
-        .stat-box { display: flex; align-items: baseline; gap: 4px; }
-        .stat-val { font-size: 18px; font-weight: 800; }
-        .stat-label { font-size: 8px; font-weight: 600; color: #94a3b8; }
+        .stat-val { font-size: 16px; font-weight: 800; display: block; }
+        .stat-label { font-size: 8px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
 
         .main-container { padding: 0 25px 40px 25px; }
-        .table-card { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; }
+        .table-card { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        
-        /* Cabeçalho Interno Estreito */
-        .sector-internal-header { background-color: #e2e8f0; color: #475569; font-size: 9px; font-weight: 900; text-transform: uppercase; }
-        .sector-internal-header td { padding: 4px 8px !important; border-bottom: 1px solid #cbd5e1; }
+        th { background: #f8fafc; padding: 12px 10px; text-align: left; font-size: 10px; font-weight: 700; color: #64748b; border-bottom: 2px solid #e2e8f0; text-transform: uppercase; }
+        td { padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
 
-        /* Estilos de Células */
-        .bold-identificador { font-weight: 900 !important; color: #000; }
-        [contenteditable="true"] { font-weight: 900 !important; color: #000; outline: none; white-space: nowrap; overflow: hidden; }
-        .obs-cell { white-space: normal !important; line-height: 1.2; font-weight: 600 !important; }
-        
-        select { font-weight: 900 !important; color: #000; background: transparent; width: 100%; }
+        /* Ajustes de Negrito solicitados por você */
+        .bold-identificador { font-family: 'Inter', sans-serif; font-weight: 900 !important; color: #000 !important; font-size: 13px; }
+        [contenteditable="true"] { font-weight: 900 !important; color: #000 !important; }
+        select { font-weight: 900 !important; color: #000 !important; background: rgba(255,255,255,0.5); border-radius: 4px; padding: 2px; }
 
-        .setor-row { background-color: #1e293b !important; cursor: pointer; color: #fff !important; }
-        
+        .setor-row { background-color: #1e293b !important; cursor: pointer; }
+        .setor-text { color: #ffffff !important; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
+        .sub-header { background-color: #f1f5f9 !important; font-size: 10px; font-weight: 800; color: #475569; }
+        .hidden-row { display: none !important; }
+
         #status-menu { 
-            display: none; position: absolute; z-index: 1000; min-width: 180px;
+            display: none; position: absolute; z-index: 1000; min-width: 200px;
             background: #fff; border-radius: 12px; border: 1px solid #e2e8f0;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 6px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); padding: 6px;
         }
-        .menu-item { padding: 8px 12px; border-radius: 6px; font-size: 10px; font-weight: 700; cursor: pointer; margin-bottom: 2px; text-transform: uppercase; }
+        .menu-item { padding: 10px 14px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; margin-bottom: 2px; text-transform: uppercase; }
+        
+        .extra-info { 
+            font-size: 9px; font-weight: 900; width: 100%; border: 1px solid rgba(0,0,0,0.3); border-radius: 4px;
+            text-align: center; text-transform: uppercase; outline: none; background: #fff; margin-top: 4px; color: #000;
+        }
+        [contenteditable="true"]:focus { background: #f8fafc; outline: 1px solid #000; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -74,12 +85,12 @@
                 <div class="kpi-box"><span class="kpi-label text-red-700">Bloqueio</span><span id="kpi-bloqueados" class="kpi-num text-red-700">0</span></div>
                 <div class="kpi-box" style="background: #f8fafc;"><span class="kpi-label text-purple-800">Ocupação</span><span id="kpi-taxa" class="kpi-num text-purple-800">0%</span></div>
             </div>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-6">
                 <div class="text-right border-r pr-4 border-slate-200">
-                    <h1 class="text-[14px] font-900 uppercase leading-none">Regulação</h1>
-                    <span class="text-[10px] text-slate-400">Censo Dinâmico</span>
+                    <h1 class="text-[14px] font-[800] uppercase leading-none tracking-tight">Regulação</h1>
+                    <span class="text-[10px] font-[600] text-slate-400 uppercase">Censo Dinâmico</span>
                 </div>
-                <button onclick="resetHome()" class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">⌂</button>
+                <div class="home-btn" onclick="resetHome()">⌂</div>
             </div>
         </div>
         <div id="sector-dashboard"></div>
@@ -87,9 +98,16 @@
 
     <div class="main-container">
         <div class="table-card">
-            <table id="main-table">
+            <table>
                 <colgroup>
-                    <col style="width: 100px;"> <col style="width: 60px;">  <col style="width: 200px;"> <col style="width: 90px;">  <col style="width: 45px;">  <col style="width: 110px;"> <col style="width: auto;">  </colgroup>
+                    <col style="width: 140px;"><col style="width: 80px;"><col style="width: 300px;">
+                    <col style="width: 110px;"><col style="width: 70px;"><col style="width: 140px;"><col style="width: auto;">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>Situação</th><th>Leito</th><th>Paciente</th><th>Atendimento</th><th>Sexo</th><th>Origem</th><th>Observação</th>
+                    </tr>
+                </thead>
                 <tbody id="censo-body"></tbody>
             </table>
         </div>
@@ -99,126 +117,141 @@
 
     <script>
         const API_URL = `${window.location.origin}/api/v1`;
-        const config = {
-            'LIVRE': 'bg-[#facc15] text-[#422006]', 'SUJO': 'bg-[#eab308] text-[#422006]', 'LIMPO': 'bg-[#fde047] text-[#422006]', 'FORRADO': 'bg-[#fef08a] text-[#422006]',
-            'OCUPADO': 'bg-[#e2e8f0] text-slate-900', 'ALTA': 'bg-[#4ade80] text-[#064e3b]', 'ALTA PENDENTE': 'bg-[#16a34a] text-white',
-            'RESERVADO': 'bg-[#38bdf8] text-[#0c4a6e]', 'BLOQUEADO': 'bg-[#f87171] text-[#7f1d1d]', 'ISOLAMENTO': 'bg-[#f472b6] text-[#702459]'
-        };
         
-        let setoresAbertos = new Set(), targetId = null, cachedData = [];
+        const config = {
+            'LIVRE': 'bg-[#facc15] text-[#422006]', 
+            'SUJO': 'bg-[#eab308] text-[#422006]', 
+            'LIMPO': 'bg-[#fde047] text-[#422006]', 
+            'FORRADO': 'bg-[#fef08a] text-[#422006]',
+            'OCUPADO': 'bg-white text-slate-900', 
+            'ALTA': 'bg-[#4ade80] text-[#064e3b]', 
+            'ALTA PENDENTE': 'bg-[#16a34a] text-white',
+            'RESERVADO': 'bg-[#38bdf8] text-[#0c4a6e]', 
+            'BLOQUEADO': 'bg-[#f87171] text-[#7f1d1d]', 
+            'ISOLAMENTO': 'bg-[#f472b6] text-[#702459]'
+        };
+
+        const tiposIsolamento = ['KPC','PSEUDOMONAS','ACINETO','INFLUENZA','COVID','HERPES ZOSTER','CLOSTRIDIUN','TUBERCULOSE','DESORIENTADO','PSIQUIÁTRICO','DIÁLISE PERITONIAL','OUTROS'];
+        
+        let setoresAbertos = new Set();
+        let targetCell = null;
+        let cachedData = [];
+
+        function resetHome() { setoresAbertos.clear(); renderTable(cachedData); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+        async function syncData(leitoId, campo, valor) {
+            const item = cachedData.find(d => d.identificador === leitoId);
+            if (item) {
+                const mapCampos = { 'p': 'paciente_nome', 'a': 'atendimento', 'sx': 'sexo', 'o': 'origem', 'obs': 'observacao', 's': 'status', 'obs_s': 'observacao_status' };
+                item[mapCampos[campo] || campo] = valor;
+            }
+            try {
+                const cleanVal = typeof valor === 'string' ? valor.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : valor;
+                await fetch(`${API_URL}/atualizar`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ n: leitoId, [campo]: cleanVal }) });
+                updateKPIs();
+            } catch (e) { console.error("Erro na sincronização"); }
+        }
 
         async function loadCenso() {
             try {
                 const response = await fetch(`${API_URL}/censo`);
                 cachedData = await response.json();
-                renderTable();
-            } catch (e) { console.warn("Offline"); }
+                renderTable(cachedData);
+            } catch (e) { console.warn("Modo Offline"); }
         }
 
-        function updateKPIs() {
-            let g = { t: 0, o: 0, l: 0, i: 0, b: 0, a: 0, ap: 0, r: 0 }, porSetor = {};
-            cachedData.forEach(item => {
-                const s = item.setor, st = item.status;
-                if (!porSetor[s]) porSetor[s] = { l: 0, o: 0 };
-                g.t++;
-                if (['OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'ISOLAMENTO'].includes(st)) {
-                    g.o++; porSetor[s].o++;
-                    if(st === 'ALTA') g.a++; if(st === 'ALTA PENDENTE') g.ap++; if(st === 'RESERVADO') g.r++; if(st === 'ISOLAMENTO') g.i++;
-                } else if (st === 'BLOQUEADO') { g.b++; } else { g.l++; porSetor[s].l++; }
-            });
-
-            document.getElementById('kpi-total').innerText = g.t;
-            document.getElementById('kpi-ocupados').innerText = g.o;
-            document.getElementById('kpi-livres').innerText = g.l;
-            document.getElementById('kpi-altas').innerText = g.a;
-            document.getElementById('kpi-altas-pend').innerText = g.ap;
-            document.getElementById('kpi-reservados').innerText = g.r;
-            document.getElementById('kpi-isolamento').innerText = g.i;
-            document.getElementById('kpi-bloqueados').innerText = g.b;
-            document.getElementById('kpi-taxa').innerText = `${g.t > 0 ? ((g.o / g.t) * 100).toFixed(1) : 0}%`;
-
-            document.getElementById('sector-dashboard').innerHTML = Object.keys(porSetor).map(setor => `
-                <div class="sector-card">
-                    <div class="sector-name">${setor}</div>
-                    <div class="sector-stats">
-                        <div class="stat-box"><span class="stat-val text-yellow-600">${porSetor[setor].l}</span><span class="stat-label">DISP</span></div>
-                        <div class="stat-box"><span class="stat-val text-blue-900">${porSetor[setor].o}</span><span class="stat-label">OCUP</span></div>
-                    </div>
-                </div>`).join('');
-        }
-
-        function renderTable() {
+        function renderTable(dados) {
             const body = document.getElementById('censo-body');
-            let html = "", lastSetor = "", lastSub = "";
-            
-            cachedData.forEach(item => {
+            let html = ""; let lastSetor = ""; let lastSub = "";
+
+            dados.forEach(item => {
                 if(item.setor !== lastSetor) {
                     lastSetor = item.setor; lastSub = "";
                     const isOpen = setoresAbertos.has(lastSetor);
-                    html += `<tr class="setor-row" onclick="toggleSetor('${lastSetor}')"><td colspan="7" class="text-center py-2 font-bold uppercase text-[12px] tracking-widest">${isOpen ? '▾' : '▸'} ${lastSetor}</td></tr>`;
-                    
-                    if(isOpen) {
-                        html += `<tr class="sector-internal-header">
-                            <td class="text-center">Status</td><td class="text-center">Leito</td>
-                            <td>Paciente</td><td class="text-center">Atend</td>
-                            <td class="text-center">Sx</td><td>Origem</td><td>Observação</td>
-                        </tr>`;
-                    }
+                    html += `<tr class="setor-row" onclick="toggleSetor('${lastSetor}')">
+                                <td colspan="7" class="setor-text text-center py-3">
+                                    <span class="mr-2">${isOpen ? '▾' : '▸'}</span>${lastSetor}
+                                </td>
+                             </tr>`;
                 }
-                if (!setoresAbertos.has(lastSetor)) return;
 
+                const isVisible = setoresAbertos.has(lastSetor);
                 if(item.sub_header && item.sub_header !== lastSub) {
                     lastSub = item.sub_header;
-                    html += `<tr class="sub-header bg-slate-50 font-bold border-b border-slate-200"><td colspan="7" class="py-1.5 px-4 text-[10px] text-slate-500">↳ ${item.sub_header}</td></tr>`;
+                    html += `<tr class="sub-header ${isVisible ? '' : 'hidden-row'}"><td colspan="7" class="py-2 px-4">↳ ${item.sub_header}</td></tr>`;
                 }
 
-                html += `<tr class="row-leito ${config[item.status]} border-b border-white/20" data-id="${item.identificador}">
-                    <td class="status-cell cursor-pointer text-center font-bold py-2.5 text-[11px]" onclick="openMenu(event, '${item.identificador}', '${item.tipo}')">${item.status}</td>
-                    <td class="text-center bold-identificador border-r border-black/5">${item.identificador}</td>
-                    <td contenteditable="true" class="px-3 uppercase text-[12px]" onblur="syncData('${item.identificador}', 'p', this.innerText)">${item.paciente_nome || ''}</td>
-                    <td contenteditable="true" class="text-center text-[12px]" onblur="syncData('${item.identificador}', 'a', this.innerText)">${item.atendimento || ''}</td>
-                    <td class="p-0"><select class="text-center h-full outline-none" onchange="syncData('${item.identificador}', 'sx', this.value)"><option value=""></option><option value="M" ${item.sexo === 'M' ? 'selected' : ''}>M</option><option value="F" ${item.sexo === 'F' ? 'selected' : ''}>F</option></select></td>
-                    <td class="p-0"><select class="px-1 h-full outline-none text-[10px]" onchange="syncData('${item.identificador}', 'o', this.value)"><option value=""></option>${(item.tipo === 'UTI' ? ['PS HMS', 'PS VV', 'CC', 'EXTERNO'] : ['PS HMS', 'PS VV', 'CC', 'EXTERNO', 'ALTA UTI']).map(o => `<option value="${o}" ${item.origem === o ? 'selected' : ''}>${o}</option>`).join('')}</select></td>
-                    <td contenteditable="true" class="obs-cell px-3 italic text-[12px]" onblur="syncData('${item.identificador}', 'obs', this.innerText)">${item.observacao || ''}</td>
+                let extra = '';
+                if (item.status === 'ISOLAMENTO') {
+                    extra = `<select class="extra-info" onchange="syncData('${item.identificador}', 'obs_s', this.value)">${tiposIsolamento.map(t => `<option value="${t}" ${item.observacao_status === t ? 'selected' : ''}>${t}</option>`).join('')}</select>`;
+                } else if (item.status === 'BLOQUEADO') {
+                    extra = `<input type="text" class="extra-info" placeholder="Motivo..." value="${item.observacao_status || ''}" onblur="syncData('${item.identificador}', 'obs_s', this.value)">`;
+                }
+
+                let origens = item.tipo === 'UTI' ? ['PS HMS', 'PS VV', 'CC', 'INTERCORRÊNCIA', 'EXTERNO'] : ['PS HMS', 'PS VV', 'CC', 'EXTERNO', 'ALTA UTI CLI', 'ALTA UTI CIR'];
+                let origemOpts = `<option value=""></option>` + origens.map(o => `<option value="${o}" ${item.origem === o ? 'selected' : ''}>${o}</option>`).join('');
+
+                html += `<tr class="row-leito ${config[item.status]} ${isVisible ? '' : 'hidden-row'}" data-type="${item.tipo}" data-id="${item.identificador}">
+                    <td class="status-cell cursor-pointer text-center font-bold"><div class="py-1">${item.status}</div><div class="extra-container">${extra}</div></td>
+                    <td class="text-center bold-identificador border-r border-slate-100">${item.identificador}</td>
+                    <td contenteditable="true" class="uppercase px-4" onblur="syncData('${item.identificador}', 'p', this.innerText)">${item.paciente_nome || ''}</td>
+                    <td contenteditable="true" class="text-center" onblur="syncData('${item.identificador}', 'a', this.innerText)">${item.atendimento || ''}</td>
+                    <td class="p-0"><select class="w-full text-center outline-none h-full" onchange="syncData('${item.identificador}', 'sx', this.value)">
+                        <option value=""></option><option value="M" ${item.sexo === 'M' ? 'selected' : ''}>M</option><option value="F" ${item.sexo === 'F' ? 'selected' : ''}>F</option>
+                    </select></td>
+                    <td class="p-0"><select class="w-full px-2 outline-none h-full text-[11px]" onchange="syncData('${item.identificador}', 'o', this.value)">${origemOpts}</select></td>
+                    <td contenteditable="true" class="italic px-4" onblur="syncData('${item.identificador}', 'obs', this.innerText)">${item.observacao || ''}</td>
                 </tr>`;
             });
             body.innerHTML = html;
             updateKPIs();
         }
 
-        window.openMenu = (e, id, tipo) => {
-            targetId = id;
-            const opts = tipo === 'UTI' ? ['LIVRE', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'] : ['SUJO', 'LIMPO', 'FORRADO', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'];
-            document.getElementById('menu-content').innerHTML = opts.map(o => `<div onclick="applyStatus('${o}')" class="menu-item ${config[o]}">${o}</div>`).join('');
-            const menu = document.getElementById('status-menu');
-            menu.style.display = 'block'; menu.style.top = `${e.pageY}px`; menu.style.left = `${e.pageX}px`;
-            e.stopPropagation();
-        };
+        function toggleSetor(nome) { if (setoresAbertos.has(nome)) setoresAbertos.delete(nome); else setoresAbertos.add(nome); renderTable(cachedData); }
 
-        window.applyStatus = (status) => {
-            const item = cachedData.find(d => d.identificador === targetId);
-            if (item) item.status = status;
-            syncData(targetId, 's', status);
-            renderTable();
-            document.getElementById('status-menu').style.display = 'none';
-        };
+        document.addEventListener('click', (e) => {
+            const cell = e.target.closest('.status-cell');
+            if (cell && !e.target.closest('.extra-container')) {
+                targetCell = cell; const row = targetCell.closest('tr');
+                let opts = row.dataset.type === 'UTI' ? ['LIVRE', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'] : ['SUJO', 'LIMPO', 'FORRADO', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'];
+                document.getElementById('menu-content').innerHTML = opts.map(o => `<div onclick="applyStatus('${o}')" class="menu-item ${config[o]}">${o}</div>`).join('');
+                const menu = document.getElementById('status-menu');
+                menu.style.display = 'block'; menu.style.top = `${e.pageY}px`; menu.style.left = `${e.pageX}px`;
+            } else if (!e.target.closest('#status-menu')) { document.getElementById('status-menu').style.display = 'none'; }
+        });
 
-        async function syncData(id, campo, valor) {
-            try {
-                const item = cachedData.find(d => d.identificador === id);
-                if (item) {
-                    const map = { 'p': 'paciente_nome', 'a': 'atendimento', 'sx': 'sexo', 'o': 'origem', 'obs': 'observacao', 's': 'status' };
-                    item[map[campo] || campo] = valor.toUpperCase();
-                }
-                await fetch(`${API_URL}/atualizar`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ n: id, [campo]: valor }) });
-                updateKPIs();
-            } catch (e) {}
+        window.applyStatus = (status) => { const row = targetCell.closest('tr'); syncData(row.dataset.id, 's', status); renderTable(cachedData); document.getElementById('status-menu').style.display = 'none'; };
+
+        function updateKPIs() {
+            let g = { t: 0, o: 0, l: 0, i: 0, b: 0, a: 0, ap: 0, r: 0 }; let porSetor = {};
+            cachedData.forEach(item => {
+                const s = item.setor; const st = item.status;
+                if (!porSetor[s]) porSetor[s] = { l: 0, o: 0 };
+                g.t++;
+                if (['ISOLAMENTO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'OCUPADO'].includes(st)) { g.o++; porSetor[s].o++; if(st === 'ISOLAMENTO') g.i++; if(st === 'ALTA') g.a++; if(st === 'ALTA PENDENTE') g.ap++; if(st === 'RESERVADO') g.r++; }
+                else if (st === 'BLOQUEADO') g.b++;
+                else if (['LIVRE', 'FORRADO', 'LIMPO', 'SUJO'].includes(st)) { g.l++; porSetor[s].l++; }
+            });
+            document.getElementById('kpi-total').innerText = g.t;
+            document.getElementById('kpi-ocupados').innerText = g.o;
+            document.getElementById('kpi-livres').innerText = g.l;
+            document.getElementById('kpi-isolamento').innerText = g.i;
+            document.getElementById('kpi-bloqueados').innerText = g.b;
+            document.getElementById('kpi-altas').innerText = g.a;
+            document.getElementById('kpi-altas-pend').innerText = g.ap;
+            document.getElementById('kpi-reservados').innerText = g.r;
+            document.getElementById('kpi-taxa').innerText = `${g.t > 0 ? ((g.o / g.t) * 100).toFixed(1) : 0}%`;
+
+            document.getElementById('sector-dashboard').innerHTML = Object.keys(porSetor).map(setor => `
+                <div class="sector-card">
+                    <div class="sector-name">${setor}</div>
+                    <div class="sector-stats">
+                        <div class="stat-box bg-yellow-50/50"><span class="stat-val text-yellow-800">${porSetor[setor].l}</span><span class="stat-label">DISP</span></div>
+                        <div class="stat-box bg-blue-50/50"><span class="stat-val text-blue-900">${porSetor[setor].o}</span><span class="stat-label">OCUP</span></div>
+                    </div>
+                </div>`).join('');
         }
 
-        function toggleSetor(n) { setoresAbertos.has(n) ? setoresAbertos.delete(n) : setoresAbertos.add(n); renderTable(); }
-        function resetHome() { setoresAbertos.clear(); renderTable(); }
-        
-        document.addEventListener('click', () => document.getElementById('status-menu').style.display = 'none');
         loadCenso();
         setInterval(loadCenso, 45000);
     </script>
