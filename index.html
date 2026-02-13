@@ -43,26 +43,21 @@
         .stat-label { font-size: 8px; font-weight: 600; color: #94a3b8; text-transform: uppercase; margin-top: 2px; }
 
         .main-container { padding: 0 25px 40px 25px; }
-        .table-card { background: #fff; border-radius: 12px; border: 1px solid #000; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .table-card { background: #fff; border-radius: 12px; border: 1px solid #000; overflow: visible; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         
-        /* AJUSTE PARA BORDAS PRETAS E GRID DEFINIDO */
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        
+        /* CABEÇALHO FIXO (STICKY) */
+        thead { position: sticky; top: 184px; z-index: 40; } 
         th { 
             background: #f8fafc; padding: 14px 10px; text-align: left; 
             font-size: 10px; font-weight: 700; color: #000; 
             border: 1px solid #000; text-transform: uppercase; 
         }
-        td { 
-            padding: 12px 10px; border: 1px solid #000; 
-            font-size: 12px; vertical-align: middle; 
-        }
+        
+        td { padding: 12px 10px; border: 1px solid #000; font-size: 12px; vertical-align: middle; }
 
-        /* AJUSTE DO DADO SEM QUEBRA DE LINHA */
-        .bold-identificador { 
-            font-weight: 900 !important; color: #000 !important; 
-            font-size: 13px; white-space: nowrap !important; 
-        }
-
+        .bold-identificador { font-weight: 900 !important; color: #000 !important; font-size: 13px; white-space: nowrap !important; }
         [contenteditable="true"] { font-weight: 900 !important; color: #000 !important; }
         select { font-weight: 900 !important; color: #000 !important; background: rgba(255,255,255,0.5); border-radius: 4px; padding: 2px; }
 
@@ -110,7 +105,8 @@
             <table>
                 <colgroup>
                     <col style="width: 140px;">
-                    <col style="width: 100px;"> <col style="width: 380px;">
+                    <col style="width: 100px;">
+                    <col style="width: 380px;">
                     <col style="width: 110px;">
                     <col style="width: 70px;">
                     <col style="width: 140px;">
