@@ -48,7 +48,7 @@
             <div class="flex gap-4">
                 <div class="flex flex-col"><span class="text-[8px] uppercase">Geral</span><span id="kpi-total" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-blue-900"><span class="text-[8px] uppercase">Ocupados</span><span id="kpi-ocupados" class="kpi-num">0</span></div>
-                <div class="flex flex-col text-green-700"><span class="text-[8px] uppercase">Livres</span><span id="kpi-livres" class="kpi-num">0</span></div>
+                <div class="flex flex-col text-green-700"><span class="text-[8px] uppercase">Livres/Forr.</span><span id="kpi-livres" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-green-600"><span class="text-[8px] uppercase">Altas</span><span id="kpi-altas" class="kpi-num">0</span></div>
                 <div class="flex flex-col text-purple-700">
                     <span class="text-[8px] uppercase">Ocupação</span>
@@ -187,12 +187,12 @@
                 targetCell = cell;
                 const row = targetCell.closest('tr');
                 
-                // Opção RESERVADO disponível para todos os tipos de leito
-                let opts = ['LIVRE', 'SUJO', 'LIMPO', 'FORRADO', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'];
-                
-                // Filtro básico por tipo se necessário (mantendo a flexibilidade solicitada)
+                // Segmentação Estratégica: Livre para UTI / Sujo-Limpo-Forrado para Clínicos
+                let opts;
                 if(row.dataset.type === 'UTI') {
                     opts = ['LIVRE', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'];
+                } else {
+                    opts = ['SUJO', 'LIMPO', 'FORRADO', 'OCUPADO', 'ALTA', 'ALTA PENDENTE', 'RESERVADO', 'BLOQUEADO', 'ISOLAMENTO'];
                 }
 
                 document.getElementById('menu-content').innerHTML = opts.map(o => `<div onclick="applyStatus('${o}')" class="menu-item ${config[o]}">${o}</div>`).join('');
@@ -242,7 +242,12 @@
                 else if (['ALTA', 'ALTA PENDENTE'].includes(st)) { g.a++; g.o++; porSetor[s].o++; }
                 else if (['OCUPADO', 'RESERVADO'].includes(st)) { g.o++; porSetor[s].o++; }
                 else if (st === 'BLOQUEADO') { g.b++; }
-                else { g.l++; porSetor[s].l++; }
+                else { 
+                    // Considera Livre ou Forrado como prontos para uso nos KPIs
+                    if(st === 'LIVRE' || st === 'FORRADO') {
+                        g.l++; porSetor[s].l++; 
+                    }
+                }
             });
 
             const taxaOcupacao = g.t > 0 ? ((g.o / g.t) * 100).toFixed(1) : 0;
@@ -259,7 +264,7 @@
                 <div class="sector-card">
                     <div class="sector-name">${setor}</div>
                     <div class="sector-stats">
-                        <div class="stat-box bg-green-50"><span class="stat-val text-green-700">${porSetor[setor].l}</span><span class="stat-label">LIVRES</span></div>
+                        <div class="stat-box bg-green-50"><span class="stat-val text-green-700">${porSetor[setor].l}</span><span class="stat-label">DISP</span></div>
                         <div class="stat-box bg-blue-50"><span class="stat-val text-blue-900">${porSetor[setor].o}</span><span class="stat-label">OCUP</span></div>
                     </div>
                 </div>`).join('');
